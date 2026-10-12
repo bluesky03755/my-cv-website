@@ -1,0 +1,1156 @@
+<title>Interview Prep Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<style>
+/* Layout: an interviewer's scorecard. Sticky bar with four tabs; Practice = setup rail + interview-room column, stacking on phones. */
+:root {
+  --bg: #EDF0EE; --surface: #FFFFFF; --sunk: #E3E8E5; --ink: #15232A; --muted: #55666B; --line: #CBD4D0;
+  --accent: #0E6A61; --accent-ink: #FFFFFF; --accent-soft: #D5EAE6;
+  --mark: #C98E14; --mark-soft: #FBEFD2;
+  --good: #2F7D4A; --good-soft: #DCEFE2; --bad: #B4413C; --bad-soft: #F6DEDC;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-voice: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-num: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E1517; --surface: #162125; --sunk: #1D2A2F; --ink: #E3EBE9; --muted: #97A7AA; --line: #2C3B40;
+  --accent: #4CBFAE; --accent-ink: #06201C; --accent-soft: #163A36;
+  --mark: #F0BE52; --mark-soft: #3A2F14;
+  --good: #5DBB7E; --good-soft: #17301F; --bad: #E57B74; --bad-soft: #3A1D1B;
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0E1517; --surface: #162125; --sunk: #1D2A2F; --ink: #E3EBE9; --muted: #97A7AA; --line: #2C3B40;
+  --accent: #4CBFAE; --accent-ink: #06201C; --accent-soft: #163A36;
+  --mark: #F0BE52; --mark-soft: #3A2F14;
+  --good: #5DBB7E; --good-soft: #17301F; --bad: #E57B74; --bad-soft: #3A1D1B;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.5; }
+h1, h2, h3 { text-wrap: balance; margin: 0; font-weight: 600; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.label { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.muted { color: var(--muted); }
+
+/* Top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.bar-in { max-width: 1180px; margin: 0 auto; padding-inline: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding-block: 10px; }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand h1 { font-family: var(--font-voice); font-weight: 500; font-size: 22px; letter-spacing: -.01em; }
+.brand .tag { font-size: 12px; color: var(--muted); }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-left: auto; }
+.tab { border: 0; background: none; padding: 6px 12px; border-radius: 999px; cursor: pointer; color: var(--muted); font-weight: 500; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.tab:hover:not([aria-selected="true"]) { background: var(--sunk); color: var(--ink); }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; }
+.notice { font-size: 13px; color: var(--muted); padding: 8px 12px; border: 1px dashed var(--line); border-radius: var(--r); margin-bottom: 16px; }
+.notice:empty { display: none; }
+
+/* Practice layout */
+.practice { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .practice { grid-template-columns: minmax(0, 1fr); } }
+.rail { display: grid; gap: 18px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); }
+@media (max-width: 860px) { .rail { position: static; } }
+.field { display: grid; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 11px; font-size: 13px; cursor: pointer; }
+.chip:hover { border-color: var(--muted); }
+.chip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); font-weight: 500; }
+.chip.sm { font-size: 12px; padding: 2px 9px; cursor: default; }
+input[type=text], textarea, select { width: 100%; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 8px 10px; }
+textarea { resize: vertical; line-height: 1.5; }
+details > summary { cursor: pointer; font-size: 13px; color: var(--muted); }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 8px 14px; cursor: pointer; font-weight: 500; }
+.btn:hover:not(:disabled) { border-color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.08); border-color: var(--accent); }
+.btn.ghost { border-color: transparent; background: none; color: var(--muted); }
+.btn.ghost:hover:not(:disabled) { color: var(--ink); border-color: var(--line); }
+.btn.danger { color: var(--bad); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row.end { justify-content: flex-end; }
+.sessionline { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }
+
+/* Room */
+.room { display: grid; gap: 16px; min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; min-width: 0; }
+.qcard { border-left: 4px solid var(--accent); }
+.qcard.follow { border-left-color: var(--mark); }
+.qmeta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-bottom: 10px; }
+.question { font-family: var(--font-voice); font-size: 24px; line-height: 1.35; margin: 0 0 12px; max-width: 46em; }
+.qcard.follow .question { font-size: 21px; }
+.testing { font-size: 13.5px; color: var(--muted); margin: 0; }
+.lookfor { margin: 10px 0 0; padding-left: 18px; font-size: 14px; }
+.answerbox { display: grid; gap: 10px; }
+.answerbox textarea { min-height: 190px; font-size: 15px; }
+.clock { font-family: var(--font-num); font-size: 13px; padding: 2px 9px; border-radius: 999px; background: var(--sunk); }
+.clock.over { background: var(--bad-soft); color: var(--bad); }
+.thinking { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+.youranswer { font-size: 14px; white-space: pre-wrap; color: var(--muted); border-left: 2px solid var(--line); padding-left: 12px; margin: 0; }
+.err { color: var(--bad); font-size: 14px; }
+
+/* Scorecard */
+.score { display: grid; gap: 16px; }
+.score-top { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.big { font-family: var(--font-num); font-size: 40px; line-height: 1; font-weight: 600; }
+.big small { font-size: 15px; color: var(--muted); font-weight: 400; }
+.verdict { font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.v-good { background: var(--good-soft); color: var(--good); }
+.v-mid { background: var(--mark-soft); color: var(--mark); }
+.v-bad { background: var(--bad-soft); color: var(--bad); }
+.headline { font-family: var(--font-voice); font-size: 18px; flex: 1 1 260px; min-width: 0; margin: 0; }
+.dims { display: grid; gap: 7px; }
+.dim { display: grid; grid-template-columns: 96px minmax(0, 1fr) 34px; gap: 10px; align-items: center; font-size: 13px; }
+.meter { height: 8px; background: var(--sunk); border-radius: 4px; position: relative; overflow: hidden; }
+.meter > span { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 4px; }
+.meter.low > span { background: var(--bad); }
+.meter::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--surface); }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.cols ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 4px; }
+.flags { background: var(--bad-soft); border-radius: var(--r); padding: 10px 14px; }
+.flags .label { color: var(--bad); }
+.flags ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; display: grid; gap: 4px; }
+.source { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.source.cta { background: var(--mark-soft); color: var(--ink); padding: 12px 14px; border-radius: var(--r); }
+.lock { font-size: 11.5px; color: var(--muted); }
+.better { font-size: 14.5px; white-space: pre-wrap; background: var(--sunk); padding: 12px 14px; border-radius: var(--r); margin: 8px 0 0; }
+.prev { display: grid; gap: 6px; }
+.prev details { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 14px; }
+.prev summary { display: flex; gap: 10px; align-items: baseline; font-size: 14px; color: var(--ink); }
+.prev summary span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* Idle */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; counter-reset: s; }
+.steps li { counter-increment: s; font-size: 13.5px; color: var(--muted); border-top: 2px solid var(--line); padding-top: 8px; }
+.steps li::before { content: counter(s); font-family: var(--font-num); color: var(--accent); font-weight: 600; margin-right: 6px; }
+.steps b { color: var(--ink); font-weight: 600; }
+.drill h2 { font-family: var(--font-voice); font-weight: 500; font-size: 22px; margin: 4px 0 6px; }
+
+/* Stories */
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.story { display: grid; gap: 8px; align-content: start; }
+.story h3 { font-size: 16px; }
+.story .one { font-size: 14px; margin: 0; }
+.pill { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--sunk); color: var(--muted); }
+.pill.ready { background: var(--good-soft); color: var(--good); }
+.pill.draft { background: var(--mark-soft); color: var(--mark); }
+.empty { text-align: left; color: var(--muted); padding: 24px; border: 1px dashed var(--line); border-radius: var(--r); }
+.miner { display: grid; gap: 12px; margin-bottom: 18px; }
+.chat { display: grid; gap: 10px; max-height: 420px; overflow-y: auto; padding-right: 4px; }
+.msg { font-size: 14.5px; max-width: 80%; padding: 9px 12px; border-radius: 10px; white-space: pre-wrap; }
+.msg.coach { background: var(--sunk); font-family: var(--font-voice); font-size: 16px; }
+.msg.me { background: var(--accent-soft); justify-self: end; }
+
+/* Progress */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; }
+.tile .v { font-family: var(--font-num); font-size: 26px; font-weight: 600; }
+.tile .s { font-size: 12.5px; color: var(--muted); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+th { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+td.n, th.n { text-align: right; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.up { color: var(--good); } .down { color: var(--bad); }
+.chart svg { width: 100%; height: auto; display: block; }
+.chart text { fill: var(--muted); font-family: var(--font-num); font-size: 11px; }
+.readout { font-size: 13px; color: var(--muted); min-height: 1.5em; }
+.notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+
+/* Profile */
+.form { display: grid; gap: 14px; max-width: 760px; }
+.pair2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+
+/* Modal */
+.overlay { position: fixed; inset: 0; background: rgb(0 0 0 / .45); display: grid; place-items: center; padding: 16px; z-index: 20; }
+.modal { background: var(--surface); border-radius: 10px; width: min(720px, 100%); max-height: 90vh; overflow-y: auto; padding: 20px; display: grid; gap: 12px; }
+.modal .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand"><h1>Prep Room</h1><span class="tag">Strategy · Ops · Product · Chief of Staff</span></div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="practice" aria-selected="true">Practice</button>
+      <button class="tab" role="tab" data-tab="stories" aria-selected="false">Story bank</button>
+      <button class="tab" role="tab" data-tab="progress" aria-selected="false">Progress</button>
+      <button class="tab" role="tab" data-tab="profile" aria-selected="false">Profile</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="notice" id="notice"></p>
+
+  <section id="tab-practice" class="practice">
+    <aside class="rail" id="rail"></aside>
+    <div class="room" id="room"></div>
+  </section>
+
+  <section id="tab-stories" hidden>
+    <div id="syncStories"></div>
+    <div class="toolbar">
+      <button class="btn primary" data-action="mine-open">Mine a story with the coach</button>
+      <button class="btn" data-action="story-new">Add a story</button>
+      <span class="muted" id="storyCount"></span>
+    </div>
+    <div id="miner"></div>
+    <div class="chips" id="storyFilter" style="margin-bottom:14px"></div>
+    <div id="storyGrid"></div>
+  </section>
+
+  <section id="tab-progress" hidden>
+    <div id="progress"></div>
+  </section>
+
+  <section id="tab-profile" hidden>
+    <div class="card form" id="profileForm"></div>
+  </section>
+</main>
+
+<div class="overlay" id="overlay" hidden></div>
+
+<script>
+// ---------- Reference data ----------
+const TRACKS = {
+  so:  { label: "Big Tech Strategy & Ops", short: "S&O",
+         lens: "Big Tech Strategy & Operations / BizOps (e.g. Meta, Google, Amazon, Uber, Airbnb, Stripe). Interviewers screen for structured problem solving, comfort with data and metrics, operational rigor, driving cross-functional execution without authority, and crisp executive communication." },
+  pm:  { label: "Product Management", short: "PM",
+         lens: "Product Management at a large tech company. Interviewers screen for product sense and user empathy, metrics and execution, prioritization and trade-offs, enough technical fluency to partner with engineering, and leadership/drive. Former consultants get probed on whether they can go deep on users and ship, not only analyze." },
+  cs:  { label: "Corporate Strategy", short: "Corp Strat",
+         lens: "Corporate Strategy / Corporate Development at a large company. Interviewers screen for strategic and financial acumen (market sizing, unit economics, build/buy/partner, M&A screening and integration), synthesis into a board-ready recommendation, and influencing senior leaders." },
+  cos: { label: "Chief of Staff", short: "CoS",
+         lens: "Chief of Staff to a senior executive. Interviewers screen for judgment and discretion, protecting the principal's time and agenda, running operating cadence (OKRs, QBRs, staff meetings), managing up and across, driving cross-org initiatives without formal authority, and being a trusted thought partner." },
+};
+const TYPES = {
+  pick:       { label: "Coach's pick" },
+  behavioral: { label: "Behavioral", guide: "Behavioral: a 'Tell me about a time…' question on a competency this track screens for. The candidate must answer from real experience." },
+  approach:   { label: "How would you approach…", guide: "Hypothetical scenario: a realistic situation the candidate could face in their first year in this role at the target company (or a comparable large company). Give the context in 2-4 sentences. Test how they would structure, prioritize and drive it, not trivia." },
+  product:    { label: "Product sense", guide: "Product sense: design or improve a product or feature for a specific user group, or critique a real product decision. Answerable in about 5 minutes." },
+  metrics:    { label: "Metrics & estimation", guide: "Metrics & estimation: define success metrics, diagnose a metric movement (e.g. 'weekly active creators dropped 8% week over week'), or a market-sizing / estimation question relevant to the company." },
+  narrative:  { label: "Your narrative", guide: "Candidate narrative: 'walk me through your background', 'why this role and why now', 'why leave consulting', 'why us', 'what would your last manager say'. Tailor it to this candidate's move into this track." },
+};
+const DIFFS = {
+  warmup:   { label: "Warm-up",    guide: "Warm-up: approachable, phone-screen level." },
+  standard: { label: "Standard",   guide: "Standard: onsite-loop level for the candidate's target level." },
+  bar:      { label: "Bar raiser", guide: "Bar raiser: hard. Add ambiguity, a constraint or a tension (conflicting stakeholders, thin data, a trade-off with no clean answer). Hold the answer to the top of the target level and be strict." },
+};
+const levelLine = () => "Target level: " + (state.profile?.level || "Director / L7-L8 at big tech; Director in corporate strategy") + ". Calibrate the bar to that level: scope, executive judgment and leading through others, not only analysis.";
+const DIMS = [
+  { k: "structure",     label: "Structure", desc: "answer-first, a clear framework or STAR arc, easy to follow" },
+  { k: "substance",     label: "Substance", desc: "specifics, numbers, scope, what the candidate personally did ('I', not 'we')" },
+  { k: "judgment",      label: "Judgment",  desc: "insight, trade-offs, prioritization, a clear so-what or recommendation" },
+  { k: "communication", label: "Delivery",  desc: "concise, executive-ready, right length for the time target" },
+  { k: "fit",           label: "Role fit",  desc: "signals this specific track screens for" },
+];
+const COMPETENCIES = ["Leadership", "Influence without authority", "Conflict", "Failure / setback", "Ambiguity", "Data-driven decision", "Prioritization", "Stakeholder management", "Executive communication", "Cross-functional execution", "Customer / user focus", "Commercial judgment", "Coaching / building a team", "Speed vs. quality", "Change management"];
+const VERDICTS = ["Strong hire", "Hire", "Lean hire", "Lean no hire", "No hire"];
+
+// ---------- State ----------
+const state = {
+  tab: "practice",
+  profile: null, stories: [], sessions: [],
+  setup: { track: "so", type: "pick", diff: "standard", company: "", jd: "" },
+  session: null, round: null, pendingQ: null, phase: "idle", // idle | asking | answering | scoring | scored | debriefing
+  showLook: false, error: "", debrief: null, qStart: 0,
+  storyFilter: "", mine: null, editing: null, confirmDelete: false,
+  loaded: false, source: null, syncing: "", syncMsg: "",
+};
+let store = null, sample = null, mcp = null, coachOff = false, ctl = null, tickTimer = null, thinkStart = 0;
+
+// ---------- Helpers ----------
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const avg = (a) => a.length ? a.reduce((x, y) => x + y, 0) / a.length : null;
+const f1 = (n) => n == null ? "–" : (Math.round(n * 10) / 10).toFixed(1);
+const fmtDate = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+const mmss = (s) => Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+const verdictClass = (v) => (v === "Strong hire" || v === "Hire") ? "v-good" : v === "Lean hire" ? "v-mid" : "v-bad";
+const clampScore = (n) => Math.max(1, Math.min(5, Number(n) || 1));
+const ERR = {
+  not_granted: "Claude isn't allowed on this page yet. Allow it from the artifact's permissions menu, then reload.",
+  sampling_disabled: "Claude isn't available for this account.",
+  rate_limited: "You've hit a usage limit. Give it a few minutes, then try again.",
+  session_expired: "Sign in to Claude again, then retry.",
+  invalid_json: "The coach's reply came back malformed. Try again.",
+  refused: "Claude declined that request. Rephrase and try again.",
+  empty_completion: "The coach returned nothing. Try again.",
+  prompt_too_large: "Too much context for one request. Trim the job description or story bank.",
+};
+const errText = (e) => ERR[e?.code] || "Something interrupted the coach. Try again.";
+const OFF_CODES = ["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"];
+
+// Writes go out one at a time so no document sees overlapping writes.
+let chain = Promise.resolve();
+const queue = (fn) => (chain = chain.then(fn).catch((e) => { setNotice("Couldn't save: " + (e?.message || e?.code || "unknown error")); }));
+
+// ---------- Storage: artifact db, or this browser as a fallback ----------
+function dbStore(db) {
+  const all = async (name, order) => {
+    let q = db.collection(name);
+    if (order) q = q.orderBy(order, "desc").limit(500);
+    const s = await q.get();
+    return s.docs.map((d) => ({ id: d.id, ...d.data() }));
+  };
+  const put = (name, obj) => { const { id, ...rest } = obj; return db.collection(name).doc(id).set(JSON.parse(JSON.stringify(rest))); };
+  return {
+    kind: "db",
+    async getProfile() { const s = await db.doc("coach/profile").get(); return s.exists ? { ...s.data() } : null; },
+    setProfile: (p) => db.doc("coach/profile").set(JSON.parse(JSON.stringify(p))),
+    async getSource() { const s = await db.doc("coach/source").get(); return s.exists ? { ...s.data() } : null; },
+    setSource: (x) => db.doc("coach/source").set(x),
+    listStories: () => all("stories"),
+    putStory: (s) => put("stories", s),
+    delStory: (id) => db.collection("stories").doc(id).delete(),
+    listSessions: () => all("sessions", "createdAt"),
+    putSession: (s) => put("sessions", s),
+  };
+}
+function localStore() {
+  const KEY = "prep-room-v1";
+  let data = { profile: null, source: null, stories: {}, sessions: {} };
+  try { const raw = localStorage.getItem(KEY); if (raw) data = JSON.parse(raw); } catch {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} };
+  return {
+    kind: "local",
+    getProfile: async () => data.profile,
+    setProfile: async (p) => { data.profile = p; save(); },
+    getSource: async () => data.source,
+    setSource: async (x) => { data.source = x; save(); },
+    listStories: async () => Object.entries(data.stories).map(([id, v]) => ({ id, ...v })),
+    putStory: async (s) => { data.stories[s.id] = s; save(); },
+    delStory: async (id) => { delete data.stories[id]; save(); },
+    listSessions: async () => Object.entries(data.sessions).map(([id, v]) => ({ id, ...v })).sort((a, b) => b.createdAt - a.createdAt),
+    putSession: async (s) => { data.sessions[s.id] = s; save(); },
+  };
+}
+
+// ---------- Stats ----------
+function answers() {
+  const out = [];
+  for (const s of [...state.sessions].sort((a, b) => a.createdAt - b.createdAt)) {
+    for (const r of s.rounds || []) for (const t of r.turns || []) if (t.eval) out.push({ ...t.eval, at: t.at || s.createdAt, track: s.track, type: r.type, follow: t.kind === "follow", q: t.q });
+  }
+  return out;
+}
+function dimStats() {
+  const a = answers(), last = a.slice(-10), prior = a.slice(-20, -10);
+  return DIMS.map((d) => ({
+    ...d,
+    recent: avg(last.map((x) => x.scores?.[d.k]).filter(Number.isFinite)),
+    prior: avg(prior.map((x) => x.scores?.[d.k]).filter(Number.isFinite)),
+    all: avg(a.map((x) => x.scores?.[d.k]).filter(Number.isFinite)),
+  }));
+}
+function weakest() {
+  if (answers().length < 3) return null;
+  return dimStats().filter((d) => d.recent != null).sort((a, b) => a.recent - b.recent)[0] || null;
+}
+function pickType(track) {
+  const counts = {};
+  for (const k of Object.keys(TYPES)) if (k !== "pick") counts[k] = 0;
+  if (track !== "pm") delete counts.product;
+  for (const a of answers()) if (!a.follow && a.track === track && counts[a.type] != null) counts[a.type]++;
+  const min = Math.min(...Object.values(counts));
+  const options = Object.keys(counts).filter((k) => counts[k] === min);
+  return options[Math.floor(Math.random() * options.length)];
+}
+
+// ---------- Prompt context ----------
+const GUARDRAILS = `Experience Bank conventions (follow them strictly): [owned] = the candidate's end to end; [joint] = only their specified part is theirs; [supported] = contributed, not theirs. 🔒 = confidential: always use the masked description, never the real name. Numbers marked identified, projected or proposed are not delivered results. Anything under "Do not use" never appears in questions, model answers or advice.`;
+function context(opts = {}) {
+  const p = state.profile || {};
+  const parts = [];
+  parts.push("CANDIDATE PROFILE\nName: " + (p.name || "(not given)") + "\n" + levelLine() + "\nBackground:\n" + (p.background || "(not provided)"));
+  if (p.tracks?.length) parts.push("TARGET TRACKS: " + p.tracks.map((t) => TRACKS[t]?.label).filter(Boolean).join(", "));
+  if (p.companies) parts.push("TARGET COMPANIES: " + p.companies);
+  if (p.notes) parts.push("CANDIDATE'S OWN NOTES: " + p.notes);
+  if (state.source?.text && opts.source !== false) parts.push("EXPERIENCE BANK (from Notion; the source of truth for what the candidate has actually done)\n" + GUARDRAILS + "\n\n" + state.source.text.slice(0, 90000));
+  else parts.push(GUARDRAILS);
+  const st = state.stories.slice(0, 60).map((s) => `- [${s.id}] ${s.title}${s.role ? " (" + s.role + ")" : ""}${s.attribution ? " [" + s.attribution + "]" : ""}${s.confidential ? " 🔒 say: " + (s.maskedAs || "masked") : ""} | ${(s.competencies || []).join(", ")} | ${s.status || "draft"}${s.oneLiner ? " | " + s.oneLiner : ""}${s.metrics ? " | numbers: " + s.metrics : ""}${s.cautions ? " | cautions: " + s.cautions : ""}`);
+  parts.push("STORY BANK\n" + (st.length ? st.join("\n") : "(empty)"));
+  const notes = (p.coachNotes || []).slice(-8).map((n) => "- " + n.text);
+  if (notes.length) parts.push("COACH NOTES FROM EARLIER SESSIONS (recurring gaps)\n" + notes.join("\n"));
+  const recent = answers().filter((a) => !a.follow).slice(-15).map((a) => "- " + a.q);
+  if (recent.length) parts.push("RECENTLY ASKED (do not repeat)\n" + recent.join("\n"));
+  return parts.join("\n\n");
+}
+
+// ---------- Coach calls ----------
+async function ask(input, opts = {}) {
+  if (!sample || coachOff) throw { code: "not_granted" };
+  ctl = new AbortController();
+  startThinking();
+  try {
+    return await (opts.json ? sample.json(input, { signal: ctl.signal, cache: false, modelTier: opts.tier || "default" })
+                            : sample(input, { signal: ctl.signal, cache: false, modelTier: opts.tier || "default" }));
+  } catch (e) {
+    if (OFF_CODES.includes(e?.code)) { coachOff = true; setNotice(errText(e)); }
+    throw e;
+  } finally { stopThinking(); ctl = null; }
+}
+
+async function generateQuestion(story) {
+  const s = state.setup, track = TRACKS[s.track];
+  let type = story ? "behavioral" : s.type;
+  let pickedNote = "";
+  if (type === "pick") { type = pickType(s.track); pickedNote = "your least-practiced format for this track"; }
+  const weak = weakest();
+  const prompt = `You are a sharp, experienced interviewer running a mock interview for a ${track.label} role${s.company ? " at " + s.company : ""}.
+${track.lens}
+${levelLine()}
+
+${context()}
+${s.jd ? "\nJOB DESCRIPTION (excerpt)\n" + s.jd.slice(0, 4000) + "\n" : ""}
+Write ONE interview question.
+Format: ${TYPES[type].guide}
+Difficulty: ${DIFFS[s.diff].guide}
+${weak && !story ? `Coaching focus: the candidate's weakest dimension lately is ${weak.label} (${weak.desc}). Choose a question that exercises it.` : ""}
+${story ? `Ask a question that this story from their bank would answer well, phrased the way a real interviewer would ask it, without naming the story: "${story.title}". ${story.oneLiner || ""}` : ""}
+Do not repeat or closely paraphrase any recently asked question. Use the candidate's real background where it makes the question sharper, but never assume facts that are not in the profile.
+
+Reply with only JSON:
+{"question": string, "competency": string (2-4 words), "testing": string (one sentence: what the interviewer is really screening for), "lookFor": [3-5 short strings: what a strong answer covers], "timeSec": number (target spoken length in seconds, 60-300), "storyIds": [ids from the story bank that could answer it; [] if none]}`;
+  const q = await ask(prompt, { json: true });
+  if (!q || typeof q.question !== "string") throw { code: "invalid_json" };
+  return {
+    type, pickedNote, question: q.question, competency: String(q.competency || ""), testing: String(q.testing || ""),
+    lookFor: Array.isArray(q.lookFor) ? q.lookFor.map(String).slice(0, 6) : [],
+    timeSec: Math.max(45, Math.min(360, Number(q.timeSec) || 150)),
+    storyIds: Array.isArray(q.storyIds) ? q.storyIds.map(String).filter((id) => state.stories.some((x) => x.id === id)) : [],
+    storyId: story?.id || null, turns: [],
+  };
+}
+
+async function evaluate(round, turn) {
+  const s = state.session, track = TRACKS[s.track];
+  const earlier = round.turns.filter((t) => t !== turn && t.eval).map((t) => `Q: ${t.q}\nA: ${t.a}`).join("\n\n");
+  const prompt = `You are an experienced ${track.label} interviewer and interview coach. Score the candidate's answer honestly, calibrated to real hiring bars, not to encouragement.
+${track.lens}
+${levelLine()}
+${DIFFS[s.diff].guide}${s.company ? "\nTarget company: " + s.company : ""}
+
+${context()}
+
+QUESTION${turn.kind === "follow" ? " (interviewer follow-up)" : ""}: ${turn.q}
+${turn.kind === "follow" ? "ORIGINAL QUESTION: " + round.question + "\n" : ""}WHAT THE INTERVIEWER IS SCREENING FOR: ${round.testing}
+A STRONG ANSWER COVERS: ${round.lookFor.join("; ")}
+${earlier ? "\nEARLIER IN THIS EXCHANGE\n" + earlier + "\n" : ""}
+CANDIDATE'S ANSWER (typed; took ${turn.secs}s; target about ${round.timeSec}s spoken):
+"""
+${turn.a}
+"""
+
+Score each dimension 1-5 (half points allowed): 1 = fails the screen, 2 = below bar, 3 = meets the bar at this level, 4 = clearly above bar, 5 = top 5% of candidates.
+${DIMS.map((d) => "- " + d.k + ": " + d.desc).join("\n")}
+For hypothetical questions judge the approach, not invented results. Don't reward length. If the answer is very short or off-topic, score it low and say so.
+
+betterAnswer: a tighter version in the candidate's own voice, at most 170 words. Use only facts the candidate gave or the profile states; where a number or detail is missing, write a bracketed placeholder such as [% lift] instead of inventing it.
+followUp: the probing follow-up a real interviewer would ask next, pushing on the weakest part; "" if the answer fully closed the loop.
+storyCandidate: if the answer drew on a real experience not already in the story bank, {"title": short title, "competencies": [1-3 strings]}; otherwise null.
+accuracyFlags: check the answer against the Experience Bank and story bank. List each place it overclaims (a projected, identified or proposed number told as a delivered result; joint or supported work told as owned; an inflated number), names a confidential client instead of its masked description, uses "Do not use" material, or contradicts the bank. Quote the phrase and give the accurate wording. [] if clean. Count real overclaims against substance and fit.
+
+Reply with only JSON:
+{"scores":{"structure":n,"substance":n,"judgment":n,"communication":n,"fit":n},"overall":n,"verdict":"Strong hire"|"Hire"|"Lean hire"|"Lean no hire"|"No hire","headline":string (one sentence),"strengths":[2-3 strings],"fixes":[2-3 specific, actionable strings],"accuracyFlags":[strings],"betterAnswer":string,"followUp":string,"storyCandidate":object|null}`;
+  const r = await ask(prompt, { json: true, tier: "complex" });
+  if (!r || typeof r !== "object" || !r.scores) throw { code: "invalid_json" };
+  const scores = {};
+  for (const d of DIMS) scores[d.k] = clampScore(r.scores[d.k]);
+  return {
+    scores, overall: clampScore(r.overall ?? avg(Object.values(scores))),
+    verdict: VERDICTS.includes(r.verdict) ? r.verdict : "Lean hire",
+    headline: String(r.headline || ""), strengths: (r.strengths || []).map(String).slice(0, 4), fixes: (r.fixes || []).map(String).slice(0, 4),
+    accuracyFlags: Array.isArray(r.accuracyFlags) ? r.accuracyFlags.map(String).filter(Boolean).slice(0, 5) : [],
+    betterAnswer: String(r.betterAnswer || ""), followUp: String(r.followUp || ""),
+    storyCandidate: r.storyCandidate && r.storyCandidate.title ? { title: String(r.storyCandidate.title), competencies: (r.storyCandidate.competencies || []).map(String).slice(0, 3) } : null,
+  };
+}
+
+// ---------- Practice flow ----------
+async function startRound(story) {
+  state.error = ""; state.showLook = false;
+  if (!state.session) {
+    const s = state.setup;
+    state.session = { id: uid("x"), createdAt: Date.now(), track: s.track, type: s.type, diff: s.diff, company: s.company.trim(), rounds: [] };
+    state.debrief = null;
+  }
+  state.phase = "asking"; renderPractice();
+  try {
+    const round = await generateQuestion(story);
+    state.round = round;
+    state.session.rounds.push(round);
+    state.pendingQ = { q: round.question, kind: "main" };
+    state.phase = "answering"; state.qStart = Date.now();
+    renderPractice();
+    $("#answer")?.focus();
+  } catch (e) {
+    if (state.session && !state.session.rounds.length) state.session = null;
+    state.phase = state.round ? "scored" : "idle";
+    if (e?.code !== "cancelled") state.error = errText(e);
+    renderPractice();
+  }
+}
+
+async function submitAnswer() {
+  const box = $("#answer"); const a = box?.value.trim();
+  if (!a) { state.error = "Write your answer first. Bullet points are fine."; renderPractice(); return; }
+  const round = state.round;
+  const turn = { q: state.pendingQ.q, kind: state.pendingQ.kind, a, secs: Math.round((Date.now() - state.qStart) / 1000), at: Date.now() };
+  round.turns.push(turn);
+  state.phase = "scoring"; state.error = ""; renderPractice();
+  try {
+    turn.eval = await evaluate(round, turn);
+    state.phase = "scored";
+    queue(() => store.putSession(state.session));
+    if (round.storyId) bumpStory(round.storyId, turn.eval.overall);
+  } catch (e) {
+    round.turns.pop();
+    state.phase = "answering";
+    if (e?.code !== "cancelled") state.error = errText(e);
+    renderPractice();
+    const b = $("#answer"); if (b) b.value = a;
+    return;
+  }
+  renderPractice(); renderProgress();
+}
+
+function bumpStory(id, score) {
+  const s = state.stories.find((x) => x.id === id); if (!s) return;
+  s.practice = [...(s.practice || []), { at: Date.now(), score }].slice(-10);
+  queue(() => store.putStory(s));
+  renderStories();
+}
+
+function answerFollowUp() {
+  const t = state.round.turns.at(-1);
+  state.pendingQ = { q: t.eval.followUp, kind: "follow" };
+  state.phase = "answering"; state.qStart = Date.now(); state.error = "";
+  renderPractice(); $("#answer")?.focus();
+}
+
+function skipQuestion() {
+  if (state.round && !state.round.turns.length) {
+    state.session.rounds = state.session.rounds.filter((r) => r !== state.round);
+  }
+  state.round = null; state.pendingQ = null;
+  startRound();
+}
+
+async function endSession() {
+  const s = state.session;
+  const scored = s ? s.rounds.flatMap((r) => r.turns.filter((t) => t.eval).map((t) => ({ r, t }))) : [];
+  if (!scored.length) { resetSession(); return; }
+  s.overall = avg(scored.map((x) => x.t.eval.overall));
+  state.phase = "debriefing"; renderPractice();
+  try {
+    const lines = scored.map(({ r, t }) => `- [${TYPES[r.type]?.label}] ${t.q}\n  overall ${t.eval.overall} (${t.eval.verdict}); ${DIMS.map((d) => d.label + " " + t.eval.scores[d.k]).join(", ")}\n  headline: ${t.eval.headline}\n  fixes: ${t.eval.fixes.join(" / ")}`).join("\n");
+    const prior = (state.profile?.coachNotes || []).slice(-8).map((n) => "- " + n.text).join("\n");
+    const d = await ask(`You are an interview coach closing out a mock-interview session for a ${TRACKS[s.track].label} role${s.company ? " at " + s.company : ""}.
+
+SESSION RESULTS
+${lines}
+
+COACH NOTES FROM EARLIER SESSIONS
+${prior || "(none yet)"}
+
+Write a short debrief. Reply with only JSON:
+{"summary": string (2-3 sentences, direct), "wins": [1-2 strings], "focusNext": [1-3 specific habits to drill next time; merge with earlier notes where they repeat, and say so]}`, { json: true });
+    s.debrief = { summary: String(d.summary || ""), wins: (d.wins || []).map(String), focusNext: (d.focusNext || []).map(String) };
+    const p = state.profile || {};
+    p.coachNotes = [...(p.coachNotes || []), ...s.debrief.focusNext.map((text) => ({ at: Date.now(), text }))].slice(-12);
+    state.profile = p;
+    queue(() => store.setProfile(p));
+  } catch (e) {
+    if (e?.code !== "cancelled") setNotice("Session saved without a debrief: " + errText(e));
+  }
+  queue(() => store.putSession(s));
+  if (!state.sessions.includes(s)) state.sessions.unshift(s);
+  state.debrief = s.debrief || null;
+  resetSession(true);
+}
+
+function resetSession(keepDebrief) {
+  if (state.session && !state.sessions.includes(state.session) && state.session.rounds.some((r) => r.turns.some((t) => t.eval))) state.sessions.unshift(state.session);
+  state.session = null; state.round = null; state.pendingQ = null; state.phase = "idle";
+  if (!keepDebrief) state.debrief = null;
+  renderPractice(); renderProgress();
+}
+
+// ---------- Thinking indicator ----------
+function startThinking() {
+  thinkStart = Date.now();
+  clearInterval(tickTimer);
+  tickTimer = setInterval(tick, 1000);
+}
+function stopThinking() { thinkStart = 0; }
+function tick() {
+  if (thinkStart) document.querySelectorAll(".secs").forEach((el) => { el.textContent = Math.round((Date.now() - thinkStart) / 1000) + "s"; });
+  const c = $("#clock");
+  if (c && state.phase === "answering") {
+    const secs = (Date.now() - state.qStart) / 1000;
+    c.textContent = mmss(secs) + " / " + mmss(state.round?.timeSec || 150);
+    c.classList.toggle("over", secs > (state.round?.timeSec || 150));
+  }
+}
+setInterval(tick, 1000);
+const thinking = (msg) => `<div class="thinking"><span class="pulse"></span><span>${esc(msg)}</span><span class="num secs">0s</span><button class="btn ghost" data-action="stop">Stop</button></div>`;
+
+// ---------- Render: Practice ----------
+function renderPractice() { renderRail(); renderRoom(); }
+
+function chipRow(key, entries, current, disabled) {
+  return `<div class="chips">${entries.map(([k, v]) => `<button class="chip" data-set="${key}" data-val="${k}" aria-pressed="${k === current}" ${disabled ? "disabled" : ""}>${esc(v.label)}</button>`).join("")}</div>`;
+}
+
+function renderRail() {
+  const s = state.setup, live = !!state.session, busy = ["asking", "scoring", "debriefing"].includes(state.phase);
+  const scored = state.session ? state.session.rounds.flatMap((r) => r.turns.filter((t) => t.eval)) : [];
+  const a = avg(scored.map((t) => t.eval.overall));
+  $("#rail").innerHTML = `
+    <div class="field"><span class="label">Role track</span>${chipRow("track", Object.entries(TRACKS), s.track, live)}</div>
+    <div class="field"><span class="label">Question type</span>${chipRow("type", Object.entries(TYPES), s.type, false)}</div>
+    <div class="field"><span class="label">Difficulty</span>${chipRow("diff", Object.entries(DIFFS), s.diff, live)}</div>
+    <div class="field"><label class="label" for="company">Target company</label><input type="text" id="company" placeholder="e.g. Google, Stripe, Pfizer" value="${esc(s.company)}" ${live ? "disabled" : ""}></div>
+    <details ${s.jd ? "open" : ""}><summary>Paste a job description (optional)</summary>
+      <textarea id="jd" rows="6" placeholder="Paste the posting. Questions will be tailored to it." style="margin-top:8px">${esc(s.jd)}</textarea></details>
+    ${live ? `<div class="sessionline">
+        <span>Session in progress · <span class="num">${state.session.rounds.length}</span> question${state.session.rounds.length === 1 ? "" : "s"} · avg <span class="num">${f1(a)}</span></span>
+        <div class="row"><button class="btn" data-action="end" ${busy ? "disabled" : ""}>End & debrief</button><button class="btn ghost" data-action="discard" ${busy ? "disabled" : ""}>Discard</button></div>
+      </div>` : `<button class="btn primary" data-action="start" ${busy || coachOff || !sample ? "disabled" : ""}>Start session</button>`}
+  `;
+}
+
+function scorecard(ev) {
+  return `<div class="score">
+    <div class="score-top">
+      <div class="big">${f1(ev.overall)}<small> / 5</small></div>
+      <span class="verdict ${verdictClass(ev.verdict)}">${esc(ev.verdict)}</span>
+      <p class="headline">${esc(ev.headline)}</p>
+    </div>
+    <div class="dims">${DIMS.map((d) => { const v = ev.scores[d.k]; return `<div class="dim" title="${esc(d.desc)}"><span>${d.label}</span><span class="meter ${v < 3 ? "low" : ""}"><span style="width:${(v / 5) * 100}%"></span></span><span class="num">${f1(v)}</span></div>`; }).join("")}</div>
+    <div class="cols">
+      <div><span class="label">What worked</span><ul>${ev.strengths.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
+      <div><span class="label">Fix next time</span><ul>${ev.fixes.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>
+    </div>
+    ${(ev.accuracyFlags || []).length ? `<div class="flags"><span class="label">Accuracy check against your Experience Bank</span><ul>${ev.accuracyFlags.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+    ${ev.betterAnswer ? `<details><summary>A tighter version of your answer</summary><p class="better">${esc(ev.betterAnswer)}</p></details>` : ""}
+  </div>`;
+}
+
+function renderRoom() {
+  const room = $("#room");
+  const err = state.error ? `<p class="err" role="alert">${esc(state.error)}</p>` : "";
+  if (!state.session) {
+    room.innerHTML = (state.source ? "" : `<div id="syncPractice">${syncHtml()}</div>`) + idleView() + err;
+    return;
+  }
+  const s = state.session, r = state.round;
+  const prev = s.rounds.filter((x) => x !== r && x.turns.some((t) => t.eval));
+  let html = "";
+  if (prev.length) html += `<div class="prev">${prev.map((x, i) => { const last = x.turns.filter((t) => t.eval).at(-1).eval; return `<details><summary><span class="num">Q${i + 1}</span><span class="verdict ${verdictClass(last.verdict)}">${f1(last.overall)}</span><span>${esc(x.question)}</span></summary>${x.turns.filter((t) => t.eval).map((t) => `<p class="label" style="margin:12px 0 4px">${t.kind === "follow" ? "Follow-up" : "Question"}</p><p style="margin:0 0 8px">${esc(t.q)}</p><p class="youranswer">${esc(t.a)}</p><div style="margin-top:12px">${scorecard(t.eval)}</div>`).join("")}</details>`; }).join("")}</div>`;
+
+  if (state.phase === "asking") { html += `<div class="card">${thinking("Your interviewer is writing a question…")}</div>`; room.innerHTML = html + err; return; }
+  if (state.phase === "debriefing") { html += `<div class="card">${thinking("Writing your session debrief…")}</div>`; room.innerHTML = html + err; return; }
+  if (!r) { room.innerHTML = html + err + `<div class="card row"><button class="btn primary" data-action="next">Next question</button></div>`; return; }
+
+  const storyNames = r.storyIds.map((id) => state.stories.find((x) => x.id === id)?.title).filter(Boolean);
+  html += `<div class="card qcard">
+    <div class="qmeta"><span class="label">${esc(TRACKS[s.track].short)} · ${esc(TYPES[r.type].label)}${r.competency ? " · " + esc(r.competency) : ""}</span>${r.pickedNote ? `<span class="label" style="color:var(--accent)">Coach's pick: ${esc(r.pickedNote)}</span>` : ""}</div>
+    <p class="question">${esc(r.question)}</p>
+    <p class="testing"><b>Testing:</b> ${esc(r.testing)}</p>
+    ${state.showLook || r.turns.length ? `<ul class="lookfor">${r.lookFor.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : ""}
+    ${storyNames.length ? `<div class="row" style="margin-top:10px"><span class="label">Stories that could fit</span>${storyNames.map((n) => `<span class="chip sm">${esc(n)}</span>`).join("")}</div>` : ""}
+  </div>`;
+
+  r.turns.forEach((t, i) => {
+    if (t.kind === "follow") html += `<div class="card qcard follow"><div class="qmeta"><span class="label">Follow-up</span></div><p class="question">${esc(t.q)}</p></div>`;
+    html += `<div class="card"><p class="label" style="margin:0 0 6px">Your answer · <span class="num">${mmss(t.secs)}</span></p><p class="youranswer">${esc(t.a)}</p></div>`;
+    if (t.eval) {
+      const last = i === r.turns.length - 1;
+      html += `<div class="card">${scorecard(t.eval)}
+        ${last && state.phase === "scored" ? `<div class="row" style="margin-top:16px">
+          ${t.eval.followUp ? `<button class="btn primary" data-action="follow">Take the follow-up</button>` : ""}
+          <button class="btn ${t.eval.followUp ? "" : "primary"}" data-action="next">Next question</button>
+          ${t.eval.storyCandidate ? `<button class="btn ghost" data-action="save-candidate">Save “${esc(t.eval.storyCandidate.title)}” to story bank</button>` : ""}
+        </div>
+        ${t.eval.followUp ? `<p class="testing" style="margin-top:10px"><b>They'd push next with:</b> ${esc(t.eval.followUp)}</p>` : ""}` : ""}
+      </div>`;
+    }
+  });
+
+  if (state.phase === "answering") {
+    const follow = state.pendingQ.kind === "follow";
+    if (follow) html += `<div class="card qcard follow"><div class="qmeta"><span class="label">Follow-up</span></div><p class="question">${esc(state.pendingQ.q)}</p></div>`;
+    html += `<div class="card answerbox">
+      <div class="row"><label class="label" for="answer">Your answer</label><span class="clock" id="clock">0:00 / ${mmss(r.timeSec)}</span><span class="muted" style="font-size:13px">Type it the way you'd say it. Bullets are fine.</span></div>
+      <textarea id="answer" placeholder="Answer first, then support it…"></textarea>
+      ${err}
+      <div class="row">
+        <button class="btn primary" data-action="submit">Score my answer</button>
+        ${!follow && !r.turns.length && !state.showLook ? `<button class="btn ghost" data-action="look">Show what a strong answer covers</button>` : ""}
+        <button class="btn ghost" data-action="skip">${follow ? "Skip follow-up" : "Different question"}</button>
+      </div></div>`;
+    room.innerHTML = html;
+    tick();
+    return;
+  }
+  if (state.phase === "scoring") html += `<div class="card">${thinking("Scoring against the hiring bar…")}</div>`;
+  room.innerHTML = html + err;
+}
+
+function idleView() {
+  const weak = weakest(), n = answers().length, s = state.setup;
+  const d = state.debrief;
+  let drill;
+  if (!n) drill = `<span class="label">Start here</span><h2>“Walk me through your background.”</h2><p class="muted" style="margin:0 0 12px">Almost every loop opens with it, and it frames how they hear everything after. Run it for the ${esc(TRACKS[s.track].label)} track first.</p><button class="btn primary" data-action="drill" data-type="narrative" ${coachOff || !sample ? "disabled" : ""}>Run this drill</button>`;
+  else if (weak) drill = `<span class="label">Suggested drill</span><h2>Work on ${esc(weak.label.toLowerCase())}: you're averaging <span class="num">${f1(weak.recent)}</span></h2><p class="muted" style="margin:0 0 12px">That's ${esc(weak.desc)}. The coach will steer questions at it.</p><button class="btn primary" data-action="drill" data-type="pick" ${coachOff || !sample ? "disabled" : ""}>Start a focused session</button>`;
+  else drill = `<span class="label">Keep going</span><h2>A few more scored answers and the coach can spot patterns.</h2><button class="btn primary" data-action="drill" data-type="pick" ${coachOff || !sample ? "disabled" : ""}>Start a session</button>`;
+  return `
+    ${d ? `<div class="card"><span class="label">Last session debrief</span><p style="font-family:var(--font-voice);font-size:18px;margin:6px 0 10px">${esc(d.summary)}</p>
+      <div class="cols"><div><span class="label">Wins</span><ul>${d.wins.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div><div><span class="label">Drill next time</span><ul>${d.focusNext.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div></div></div>` : ""}
+    <div class="card drill">${drill}</div>
+    <div class="card"><span class="label">How a session runs</span>
+      <ol class="steps" style="margin-top:10px">
+        <li><b>Question.</b> Behavioral from your real work, or a hypothetical for the role you're targeting.</li>
+        <li><b>Your answer.</b> Typed against a clock set to how long you'd speak.</li>
+        <li><b>Scorecard.</b> Five dimensions, a hire verdict, fixes, and a tighter version with no invented facts.</li>
+        <li><b>Follow-up.</b> The probe a real interviewer would ask next. Take it or move on.</li>
+      </ol>
+      ${!sample ? `<p class="muted" style="margin:14px 0 0;font-size:13px">The coach runs on Claude and wakes up when this page opens inside Claude.</p>` : ""}
+    </div>`;
+}
+
+// ---------- Render: Stories ----------
+function storyAvg(s) { return avg((s.practice || []).map((p) => p.score)); }
+function renderStories() {
+  const comps = [...new Set(state.stories.flatMap((s) => s.competencies || []))].sort();
+  $("#storyCount").textContent = state.loaded ? `${state.stories.length} stor${state.stories.length === 1 ? "y" : "ies"} · ${state.stories.filter((s) => s.status === "ready").length} ready` : "";
+  $("#storyFilter").innerHTML = comps.length ? [["", "All"], ...comps.map((c) => [c, c])].map(([k, l]) => `<button class="chip" data-filter="${esc(k)}" aria-pressed="${state.storyFilter === k}">${esc(l)}</button>`).join("") : "";
+  const list = state.stories.filter((s) => !state.storyFilter || (s.competencies || []).includes(state.storyFilter))
+    .sort((a, b) => ({ ready: 0, draft: 1 }[a.status] ?? 2) - ({ ready: 0, draft: 1 }[b.status] ?? 2) || (b.updatedAt || 0) - (a.updatedAt || 0));
+  if (!state.loaded) { $("#storyGrid").innerHTML = `<div class="empty">Loading your story bank…</div>`; return; }
+  if (!list.length) { $("#storyGrid").innerHTML = `<div class="empty">No stories yet. Your bank holds the 8 to 12 real experiences you'll reuse across every loop. Start with <b>Mine a story with the coach</b>: it asks the questions, you answer, and it drafts the STAR card.</div>`; return; }
+  $("#storyGrid").innerHTML = `<div class="grid">${list.map((s) => {
+    const a = storyAvg(s), status = s.status || "draft";
+    return `<article class="card story">
+      <div class="row"><span class="pill ${status}">${status === "ready" ? "Ready" : status === "draft" ? "Draft" : "To mine"}</span>${s.role ? `<span class="label">${esc(s.role)}</span>` : ""}${s.attribution ? `<span class="chip sm">${esc(s.attribution)}</span>` : ""}${s.source === "notion" ? "" : `<span class="lock">added here</span>`}</div>
+      ${s.confidential ? `<span class="lock">🔒 Confidential. Say “${esc(s.maskedAs || "masked")}”</span>` : ""}
+      <h3>${esc(s.title)}</h3>
+      ${s.oneLiner ? `<p class="one">${esc(s.oneLiner)}</p>` : ""}
+      ${(s.competencies || []).length ? `<div class="chips">${s.competencies.map((c) => `<span class="chip sm">${esc(c)}</span>`).join("")}</div>` : ""}
+      <p class="muted" style="font-size:12.5px;margin:0">${(s.practice || []).length ? `Practiced <span class="num">${s.practice.length}</span>× · avg <span class="num">${f1(a)}</span>` : "Not practiced yet"}</p>
+      <div class="row">
+        ${status === "to-mine" ? `<button class="btn primary" data-action="mine-story" data-id="${s.id}">Mine it</button>` : `<button class="btn" data-action="practice-story" data-id="${s.id}" ${coachOff || !sample ? "disabled" : ""}>Practice it</button>`}
+        <button class="btn ghost" data-action="story-edit" data-id="${s.id}">Edit</button>
+        ${s.source !== "notion" && status !== "to-mine" ? `<button class="btn ghost" data-action="story-copy" data-id="${s.id}">Copy for Notion</button>` : ""}
+      </div></article>`;
+  }).join("")}</div>`;
+}
+
+function renderMiner() {
+  const m = state.mine, el = $("#miner");
+  if (!m) { el.innerHTML = ""; return; }
+  const busy = !!m.busy;
+  if (!m.started) {
+    el.innerHTML = `<div class="card miner">
+      <div class="row" style="justify-content:space-between"><h3>Mine a story</h3><button class="btn ghost" data-action="mine-close">Close</button></div>
+      <p class="muted" style="margin:0">Pick where it happened and what it should prove. The coach asks one question at a time and drafts the card from your answers. It never fills in details you didn't give.</p>
+      <div class="two">
+        <div class="field"><label class="label" for="mineRole">Where</label><input type="text" id="mineRole" list="roles" value="${esc(m.role)}" placeholder="e.g. Meta"><datalist id="roles"><option value="Motorola"><option value="Bain & Company"><option value="Accenture"><option value="Meta"><option value="Tuck MBA"></datalist></div>
+        <div class="field"><label class="label" for="mineComp">What it should prove</label><select id="mineComp">${COMPETENCIES.map((c) => `<option ${c === m.comp ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div>
+      </div>
+      <div class="row"><button class="btn primary" data-action="mine-start" ${coachOff || !sample ? "disabled" : ""}>Start</button></div>
+    </div>`;
+    return;
+  }
+  el.innerHTML = `<div class="card miner">
+    <div class="row" style="justify-content:space-between"><h3>${esc(m.comp)} · ${esc(m.role)}</h3><button class="btn ghost" data-action="mine-close">Close</button></div>
+    <div class="chat" id="chat">${m.turns.map((t) => `<div class="msg ${t.role === "assistant" ? "coach" : "me"}">${esc(t.content)}</div>`).join("")}
+      ${busy ? `<div class="thinking"><span class="pulse"></span><span>${m.busy}</span><span class="num secs">0s</span><button class="btn ghost" data-action="stop">Stop</button></div>` : ""}</div>
+    ${m.error ? `<p class="err">${esc(m.error)}</p>` : ""}
+    <textarea id="mineInput" rows="3" placeholder="Your answer…" ${busy ? "disabled" : ""}></textarea>
+    <div class="row"><button class="btn primary" data-action="mine-send" ${busy ? "disabled" : ""}>Send</button>
+      <button class="btn" data-action="mine-draft" ${busy || m.turns.filter((t) => t.role === "user").length < 2 ? "disabled" : ""}>Draft story card</button></div>
+  </div>`;
+  const c = $("#chat"); if (c) c.scrollTop = c.scrollHeight;
+}
+
+function mineRules(m) {
+  const p = state.profile || {};
+  return `You are an interview coach helping a candidate dig up a strong, specific interview story.
+Target: a story that shows "${m.comp}" from their time at ${m.role}.
+${m.seed ? `Starting point they noted: "${m.seed.title}". ${m.seed.oneLiner || ""} ${m.seed.cautions ? "Notes: " + m.seed.cautions : ""}` : ""}
+${state.source?.text ? "Their Experience Bank (what is already captured; don't re-mine it, and follow its conventions):\n" + state.source.text.slice(0, 60000) + "\n" : ""}
+Candidate background:
+${p.background || "(not provided)"}
+Existing stories (avoid duplicates): ${state.stories.filter((s) => s.status !== "to-mine").map((s) => s.title).join("; ") || "none"}
+
+How to run this: ask ONE short question at a time (at most 2 sentences). If no starting point was given, first help them find the right moment by naming 2-3 kinds of situations from that kind of role that usually show this competency, as prompts, not as facts. Then draw out: the situation and stakes, what THEY personally did and why, obstacles or pushback, numbers and outcomes, and what they would do differently. Push for specifics when an answer is vague. Never invent details. After 5-7 answers, tell them you have enough and to press "Draft story card".`;
+}
+async function mineCall() {
+  const m = state.mine;
+  m.busy = "Coach is thinking…"; m.error = ""; renderMiner();
+  const input = [{ role: "user", content: mineRules(m) + "\n\nStart now with your first question." }, ...m.turns];
+  try {
+    const { text } = await ask(input, { tier: "quick" });
+    m.turns.push({ role: "assistant", content: text.trim() });
+  } catch (e) { if (e?.code !== "cancelled") m.error = errText(e); }
+  m.busy = ""; renderMiner(); $("#mineInput")?.focus();
+}
+async function mineDraft() {
+  const m = state.mine;
+  m.busy = "Drafting the STAR card…"; m.error = ""; renderMiner();
+  const transcript = m.turns.map((t) => (t.role === "assistant" ? "COACH: " : "CANDIDATE: ") + t.content).join("\n\n");
+  try {
+    const d = await ask(`Turn this coaching conversation into an interview story card. Use only facts the candidate stated. Leave a field "" if they never covered it; in metrics you may add bracketed placeholders like [revenue impact?] for numbers worth finding.
+
+Where: ${m.role}
+Competency targeted: ${m.comp}
+Allowed competency tags: ${COMPETENCIES.join(", ")}
+
+TRANSCRIPT
+${transcript}
+
+Reply with only JSON:
+{"title": string (5-8 words), "oneLiner": string (one sentence a candidate could open with), "competencies": [1-3 tags from the allowed list], "situation": string, "task": string, "action": string (first person, the specific things they did), "result": string, "metrics": string, "lessons": string}`, { json: true });
+    const base = m.seed ? { ...m.seed } : { id: uid("s"), createdAt: Date.now(), practice: [] };
+    openEditor({ ...base, ...d, role: m.role, competencies: Array.isArray(d.competencies) && d.competencies.length ? d.competencies.map(String) : [m.comp], status: "draft" });
+    state.mine = null;
+  } catch (e) { if (e?.code !== "cancelled") m.error = errText(e); }
+  if (state.mine) state.mine.busy = "";
+  renderMiner();
+}
+
+// ---------- Notion sync ----------
+const NOTION = "Notion";
+const MCP_ERR = {
+  needs_reauth: "Reconnect Notion in claude.ai Settings → Connectors, then refresh again.",
+  server_not_connected: "Add the Notion connector in claude.ai Settings → Connectors, then refresh again.",
+  selection_required: "Choose which Notion connection this page should use, then refresh again.",
+  not_in_manifest: "Notion isn't allowed for this page. Turn it on from the artifact's permissions menu.",
+  blocked_by_policy: "Your organization blocks this Notion tool.",
+  server_unavailable: "Notion didn't respond. Try again in a minute.",
+  tool_error: "Notion couldn't open that page. Check the page link on the Profile tab.",
+  not_granted: "Connectors aren't available in this view.",
+  capability_disabled: "Connectors aren't available in this view.",
+};
+const pageIdFrom = (v) => (String(v || "").match(/[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}/i) || [String(v || "").trim()])[0];
+function pageText(payload) {
+  const raw = typeof payload === "string" ? payload : String(payload?.text ?? "");
+  const m = raw.match(/<content>([\s\S]*?)<\/content>/);
+  return { text: (m ? m[1] : raw).trim(), edited: payload?.page_last_edited_at || "", title: String(payload?.title || "").replace(/^\W+\s*/u, "") };
+}
+const slug = (v) => String(v || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+
+async function syncNotion() {
+  const p = state.profile || {};
+  const id = pageIdFrom(p.notionPage);
+  if (!id) { state.syncMsg = "Add your Experience Bank's Notion link on the Profile tab first."; renderSync(); return; }
+  if (!mcp) { state.syncMsg = "Notion is reachable only when this page runs inside Claude with the Notion connector on."; renderSync(); return; }
+  state.syncing = "Reading your Experience Bank from Notion…"; state.syncMsg = ""; renderSync();
+  let src;
+  try {
+    const res = await mcp.callTool(NOTION, "notion-fetch", { id }, { cache: false });
+    src = pageText(res.payload ?? res.content?.find((c) => c.type === "text")?.text);
+    if (!src.text) throw { code: "tool_error" };
+  } catch (e) {
+    state.syncing = ""; state.syncMsg = MCP_ERR[e?.code] || "Couldn't read Notion" + (e?.message ? ": " + e.message : "."); renderSync(); return;
+  }
+  state.syncing = "Indexing your episodes. This takes a minute or two…"; renderSync();
+  try {
+    const existing = state.stories.filter((s) => s.source === "notion").map((s) => s.key + " (" + s.title + ")");
+    const out = await ask(`You keep the interview story index for a candidate. Below is their Experience Bank from Notion, the source of truth for what they have actually done.
+${GUARDRAILS}
+
+Build one entry per distinct episode under the employer sections. Skip everything in a "Do not use" section, pitch scripts, org context, people and references, and CV-edit notes. Include a [supported] episode only if the page says it answers a common screening question. Add one entry with status "to-mine" for each employer, role or project the page lists as still to capture, and put what to dig for in "cautions".
+Reuse these existing keys when an entry is the same episode: ${existing.join("; ") || "(none)"}
+Competency tags to choose from: ${COMPETENCIES.join(", ")}
+
+Use only facts on the page. Keep each STAR field to 1-2 sentences. Put the page's honesty notes (projected vs delivered, attribution, what not to say, open gaps) in "cautions". For confidential (🔒) episodes, write the title and oneLiner with the masked description. Status is "ready" when the episode is fully captured, "draft" when the page lists gaps.
+
+Reply with only JSON:
+{"background": string (6-9 sentences: roles, employers, dates, scope and the through-line, written for an interview coach), "stories": [{"key": kebab-case id, "title": string (at most 8 words), "org": employer, "attribution": "owned"|"joint"|"supported"|"", "confidential": boolean, "maskedAs": string, "competencies": [1-3 tags], "oneLiner": string, "situation": string, "task": string, "action": string, "result": string, "metrics": string, "lessons": string, "cautions": string, "status": "ready"|"draft"|"to-mine"}]}
+
+EXPERIENCE BANK
+${src.text.slice(0, 120000)}`, { json: true, tier: "complex" });
+    const list = Array.isArray(out?.stories) ? out.stories : [];
+    if (!list.length) throw { code: "invalid_json" };
+    const now = Date.now(), seen = new Set(); let added = 0, updated = 0;
+    for (const e of list) {
+      const key = slug(e.key || e.title);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      const sid = "nb-" + key, prev = state.stories.find((x) => x.id === sid);
+      const str = (k) => String(e[k] ?? "");
+      const st = { ...(prev || {}), id: sid, key, source: "notion", title: str("title") || "Untitled", role: str("org"),
+        attribution: ["owned", "joint", "supported"].includes(e.attribution) ? e.attribution : "", confidential: !!e.confidential, maskedAs: str("maskedAs"),
+        competencies: Array.isArray(e.competencies) ? e.competencies.map(String).slice(0, 3) : [], oneLiner: str("oneLiner"),
+        situation: str("situation"), task: str("task"), action: str("action"), result: str("result"), metrics: str("metrics"), lessons: str("lessons"), cautions: str("cautions"),
+        status: ["ready", "draft", "to-mine"].includes(e.status) ? e.status : "ready", practice: prev?.practice || [], createdAt: prev?.createdAt || now, updatedAt: now };
+      if (prev) { updated++; state.stories[state.stories.indexOf(prev)] = st; } else { added++; state.stories.push(st); }
+      queue(() => store.putStory(st));
+    }
+    const gone = state.stories.filter((s) => s.source === "notion" && !seen.has(s.key));
+    for (const s of gone) {
+      if ((s.practice || []).length) { s.status = "draft"; s.source = "app"; s.cautions = "No longer in your Notion Experience Bank. " + (s.cautions || ""); queue(() => store.putStory(s)); }
+      else { state.stories = state.stories.filter((x) => x !== s); queue(() => store.delStory(s.id)); }
+    }
+    state.source = { text: src.text, pageId: id, title: src.title, editedAt: src.edited, fetchedAt: now };
+    queue(() => store.setSource(state.source));
+    if (out.background) p.background = String(out.background);
+    p.syncedAt = now; state.profile = p;
+    queue(() => store.setProfile(p));
+    state.syncMsg = `Refreshed: ${seen.size} episodes (${added} new, ${updated} updated${gone.length ? ", " + gone.length + " removed" : ""}).`;
+  } catch (e) {
+    if (e?.code !== "cancelled") state.syncMsg = "Read the page but couldn't index it: " + errText(e);
+  }
+  state.syncing = "";
+  renderSync(); renderStories(); renderProfile(); renderRoom();
+}
+
+function syncHtml() {
+  const s = state.source, p = state.profile || {};
+  if (state.syncing) return `<div class="source cta">${thinking(state.syncing)}</div>`;
+  const msg = state.syncMsg ? `<span>${esc(state.syncMsg)}</span>` : "";
+  const can = mcp && sample && !coachOff;
+  if (!state.loaded) return "";
+  if (!p.notionPage) return `<div class="source"><span>Link your Notion Experience Bank on the Profile tab to keep stories in sync.</span>${msg}</div>`;
+  if (!s) return `<div class="source cta"><span><b>Load your Experience Bank.</b> The coach reads the full Notion page, so questions and scoring use every detail and guardrail in it.</span><button class="btn primary" data-action="sync" ${can ? "" : "disabled"}>Load from Notion</button>${mcp ? "" : "<span>Works when this page runs inside Claude with Notion connected.</span>"}${msg}</div>`;
+  return `<div class="source"><span>Source: <b>${esc(s.title || "Experience Bank")}</b> in Notion · synced ${fmtDate(s.fetchedAt)}${s.editedAt ? " · page last edited " + fmtDate(s.editedAt) : ""}</span><button class="btn" data-action="sync" ${can ? "" : "disabled"}>Refresh from Notion</button>${msg}</div>`;
+}
+function renderSync() {
+  for (const id of ["syncStories", "syncPractice", "syncProfile"]) { const el = $("#" + id); if (el) el.innerHTML = syncHtml(); }
+}
+
+// ---------- Story editor ----------
+const STORY_FIELDS = [["situation", "Situation"], ["task", "Task"], ["action", "Action (what you did)"], ["result", "Result"], ["metrics", "Numbers"], ["lessons", "What you learned / would do differently"]];
+function openEditor(story) { state.editing = { ...story }; state.confirmDelete = false; renderEditor(); }
+function renderEditor() {
+  const s = state.editing, ov = $("#overlay");
+  if (!s) { ov.hidden = true; ov.innerHTML = ""; return; }
+  const exists = state.stories.some((x) => x.id === s.id);
+  ov.hidden = false;
+  ov.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-labelledby="edTitle">
+    <h2 id="edTitle" style="font-family:var(--font-voice);font-weight:500">${exists ? "Edit story" : "New story"}</h2>
+    <div class="field"><label class="label" for="ed-title">Title</label><input type="text" id="ed-title" value="${esc(s.title)}"></div>
+    <div class="pair">
+      <div class="field"><label class="label" for="ed-role">Where</label><input type="text" id="ed-role" value="${esc(s.role)}" list="roles2"><datalist id="roles2"><option value="Motorola"><option value="Bain & Company"><option value="Accenture"><option value="Meta"><option value="Tuck MBA"></datalist></div>
+      <div class="field"><label class="label" for="ed-status">Status</label><select id="ed-status">${[["ready", "Ready"], ["draft", "Draft"], ["to-mine", "To mine"]].map(([k, l]) => `<option value="${k}" ${s.status === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+    </div>
+    <div class="field"><label class="label" for="ed-comps">Competencies (comma-separated)</label><input type="text" id="ed-comps" value="${esc((s.competencies || []).join(", "))}"></div>
+    <div class="field"><label class="label" for="ed-one">One-line opener</label><input type="text" id="ed-one" value="${esc(s.oneLiner)}"></div>
+    ${STORY_FIELDS.map(([k, l]) => `<div class="field"><label class="label" for="ed-${k}">${l}</label><textarea id="ed-${k}" rows="3">${esc(s[k])}</textarea></div>`).join("")}
+    <div class="row" style="justify-content:space-between">
+      <div>${exists ? `<button class="btn danger" data-action="story-delete">${state.confirmDelete ? "Confirm delete" : "Delete"}</button>` : ""}</div>
+      <div class="row"><button class="btn ghost" data-action="story-cancel">Cancel</button><button class="btn primary" data-action="story-save">Save story</button></div>
+    </div></div>`;
+}
+function saveEditor() {
+  const s = state.editing;
+  const v = (id) => $("#" + id).value.trim();
+  Object.assign(s, { title: v("ed-title") || "Untitled story", role: v("ed-role"), status: v("ed-status"), oneLiner: v("ed-one"),
+    competencies: v("ed-comps").split(",").map((x) => x.trim()).filter(Boolean), updatedAt: Date.now() });
+  for (const [k] of STORY_FIELDS) s[k] = v("ed-" + k);
+  s.createdAt = s.createdAt || Date.now(); s.practice = s.practice || [];
+  const i = state.stories.findIndex((x) => x.id === s.id);
+  if (i >= 0) state.stories[i] = s; else state.stories.push(s);
+  queue(() => store.putStory(s));
+  state.editing = null; renderEditor(); renderStories();
+}
+
+// ---------- Render: Progress ----------
+function renderProgress() {
+  const el = $("#progress");
+  if (!state.loaded) { el.innerHTML = `<div class="empty">Loading your history…</div>`; return; }
+  const a = answers();
+  if (!a.length) { el.innerHTML = `<div class="empty">Nothing scored yet. Every answer you submit lands here: your trend against the hire bar, each of the five dimensions over time, and the habits the coach keeps flagging.</div>`; return; }
+  const ds = dimStats(), last10 = a.slice(-10);
+  const sorted = ds.filter((d) => d.recent != null).sort((x, y) => y.recent - x.recent);
+  const pts = a.slice(-30);
+  const W = 640, H = 210, L = 30, R = 12, T = 12, B = 26;
+  const x = (i) => L + (pts.length === 1 ? (W - L - R) / 2 : (i * (W - L - R)) / (pts.length - 1));
+  const y = (v) => T + ((5 - v) / 4) * (H - T - B);
+  const grid = [1, 2, 3, 4, 5].map((v) => `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1" ${v === 3 ? 'stroke-dasharray="4 3"' : ""}/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`).join("");
+  const path = pts.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.overall).toFixed(1)).join(" ");
+  const area = pts.length > 1 ? `<path d="${path} L${x(pts.length - 1).toFixed(1)} ${y(1)} L${x(0).toFixed(1)} ${y(1)} Z" fill="var(--accent-soft)" opacity=".6"/>` : "";
+  const dots = pts.map((p, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(p.overall).toFixed(1)}" r="${i === pts.length - 1 ? 5 : 4}" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" tabindex="0" data-pt="${i}"><title>${esc(fmtDate(p.at) + " · " + (TYPES[p.type]?.label || "") + " · " + f1(p.overall))}</title></circle>`).join("");
+  const byType = Object.entries(TYPES).filter(([k]) => k !== "pick").map(([k, t]) => { const xs = a.filter((p) => p.type === k && !p.follow); return { label: t.label, n: xs.length, v: avg(xs.map((p) => p.overall)) }; }).filter((r) => r.n);
+  const byTrack = Object.entries(TRACKS).map(([k, t]) => { const xs = a.filter((p) => p.track === k); return { label: t.label, n: xs.length, v: avg(xs.map((p) => p.overall)) }; }).filter((r) => r.n);
+  const notes = (state.profile?.coachNotes || []).slice().reverse();
+  el.innerHTML = `
+    <div class="tiles">
+      <div class="tile"><div class="label">Avg, last 10 answers</div><div class="v">${f1(avg(last10.map((p) => p.overall)))}</div><div class="s">3.0 = meets the hire bar</div></div>
+      <div class="tile"><div class="label">Answers scored</div><div class="v">${a.length}</div><div class="s">across ${state.sessions.length} session${state.sessions.length === 1 ? "" : "s"}</div></div>
+      <div class="tile"><div class="label">Strongest</div><div class="v" style="font-size:20px">${esc(sorted[0]?.label || "–")}</div><div class="s num">${f1(sorted[0]?.recent)}</div></div>
+      <div class="tile"><div class="label">Weakest</div><div class="v" style="font-size:20px">${esc(sorted.at(-1)?.label || "–")}</div><div class="s num">${f1(sorted.at(-1)?.recent)}</div></div>
+    </div>
+    <div class="card chart" style="margin-bottom:16px">
+      <div class="row" style="justify-content:space-between"><h3>Overall score per answer</h3><span class="muted" style="font-size:12.5px">last ${pts.length} · dashed line = hire bar</span></div>
+      <div class="readout" id="readout">Hover or focus a point for details.</div>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Overall score per answer, last ${pts.length} answers">${grid}${area}<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2"/>${dots}</svg>
+    </div>
+    <div class="two">
+      <div class="card"><h3 style="margin-bottom:8px">By dimension</h3><div class="tbl-wrap"><table><thead><tr><th>Dimension</th><th class="n">Last 10</th><th class="n">Prior 10</th><th class="n">All-time</th></tr></thead><tbody>
+        ${ds.map((d) => { const delta = d.recent != null && d.prior != null ? d.recent - d.prior : null; return `<tr><td>${d.label}</td><td class="n">${f1(d.recent)}${delta != null && Math.abs(delta) >= 0.1 ? ` <span class="${delta > 0 ? "up" : "down"}">${delta > 0 ? "▲" : "▼"}</span>` : ""}</td><td class="n">${f1(d.prior)}</td><td class="n">${f1(d.all)}</td></tr>`; }).join("")}
+      </tbody></table></div></div>
+      <div class="card"><h3 style="margin-bottom:8px">What the coach keeps flagging</h3>${notes.length ? `<ul class="notes">${notes.slice(0, 8).map((n) => `<li>${esc(n.text)} <span class="muted" style="font-size:12px">${fmtDate(n.at)}</span></li>`).join("")}</ul>` : `<p class="muted">End a session to get a debrief. Its focus points collect here and steer future questions.</p>`}</div>
+      <div class="card"><h3 style="margin-bottom:8px">By question type</h3><div class="tbl-wrap"><table><thead><tr><th>Type</th><th class="n">Answers</th><th class="n">Avg</th></tr></thead><tbody>${byType.map((r) => `<tr><td>${esc(r.label)}</td><td class="n">${r.n}</td><td class="n">${f1(r.v)}</td></tr>`).join("")}</tbody></table></div></div>
+      <div class="card"><h3 style="margin-bottom:8px">By track</h3><div class="tbl-wrap"><table><thead><tr><th>Track</th><th class="n">Answers</th><th class="n">Avg</th></tr></thead><tbody>${byTrack.map((r) => `<tr><td>${esc(r.label)}</td><td class="n">${r.n}</td><td class="n">${f1(r.v)}</td></tr>`).join("")}</tbody></table></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3 style="margin-bottom:8px">Recent sessions</h3><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Track</th><th>Company</th><th class="n">Qs</th><th class="n">Avg</th><th>Debrief</th></tr></thead><tbody>
+      ${state.sessions.slice(0, 15).map((s) => `<tr><td>${fmtDate(s.createdAt)}</td><td>${esc(TRACKS[s.track]?.short)}</td><td>${esc(s.company || "–")}</td><td class="n">${(s.rounds || []).length}</td><td class="n">${f1(s.overall ?? avg((s.rounds || []).flatMap((r) => r.turns.filter((t) => t.eval).map((t) => t.eval.overall))))}</td><td style="min-width:220px">${esc(s.debrief?.summary || "")}</td></tr>`).join("")}
+    </tbody></table></div></div>`;
+  el.querySelectorAll("circle[data-pt]").forEach((c) => {
+    const show = () => { const p = pts[+c.dataset.pt]; $("#readout").textContent = `${fmtDate(p.at)} · ${TRACKS[p.track]?.short} · ${TYPES[p.type]?.label}${p.follow ? " follow-up" : ""} · ${f1(p.overall)} ${p.verdict} · ${p.q}`; };
+    c.addEventListener("mouseenter", show); c.addEventListener("focus", show);
+  });
+}
+
+// ---------- Render: Profile ----------
+function renderProfile() {
+  const p = state.profile || {};
+  $("#profileForm").innerHTML = `
+    <h2 style="font-family:var(--font-voice);font-weight:500">What the coach knows about you</h2>
+    <p class="muted" style="margin:0">Every question and score reads this. The more specific it is, the more the questions sound like your real loops.</p>
+    <div class="field"><label class="label" for="pf-name">Name</label><input type="text" id="pf-name" value="${esc(p.name)}"></div>
+    <div class="field"><label class="label" for="pf-bg">Background</label><textarea id="pf-bg" rows="9" placeholder="Roles, scope, notable wins, numbers you can cite.">${esc(p.background)}</textarea></div>
+    <div class="field"><span class="label">Tracks you're targeting</span><div class="chips">${Object.entries(TRACKS).map(([k, t]) => `<button class="chip" data-pftrack="${k}" aria-pressed="${(p.tracks || []).includes(k)}">${esc(t.label)}</button>`).join("")}</div></div>
+    <div class="pair2"><div class="field"><label class="label" for="pf-level">Target level</label><input type="text" id="pf-level" value="${esc(p.level)}" placeholder="e.g. Director / L7-L8"></div>
+    <div class="field"><label class="label" for="pf-notion">Experience Bank in Notion (page link)</label><input type="text" id="pf-notion" value="${esc(p.notionPage)}" placeholder="Paste the Notion page link"></div></div>
+    <div class="field"><label class="label" for="pf-co">Target companies</label><input type="text" id="pf-co" value="${esc(p.companies)}" placeholder="e.g. Google, Meta, Stripe, Microsoft"></div>
+    <div class="field"><label class="label" for="pf-notes">Anything the coach should keep in mind</label><textarea id="pf-notes" rows="4" placeholder="Your story for leaving, level you're targeting, things you want pushed on.">${esc(p.notes)}</textarea></div>
+    <div class="row"><button class="btn primary" data-action="profile-save">Save profile</button><span class="muted" id="pfSaved" style="font-size:13px"></span></div>
+    <div id="syncProfile">${syncHtml()}</div>
+    ${(p.coachNotes || []).length ? `<div class="field" style="margin-top:8px"><span class="label">Coach notes (from debriefs)</span><ul class="notes">${p.coachNotes.slice().reverse().map((n) => `<li>${esc(n.text)}</li>`).join("")}</ul><div><button class="btn ghost" data-action="notes-clear">Clear coach notes</button></div></div>` : ""}`;
+}
+
+// ---------- Events ----------
+function setNotice(t) { $("#notice").textContent = t || ""; }
+function showTab(t) {
+  state.tab = t;
+  document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === t));
+  for (const k of ["practice", "stories", "progress", "profile"]) $("#tab-" + k).hidden = k !== t;
+  try { localStorage.setItem("prep-room-tab", t); } catch {}
+}
+
+document.addEventListener("input", (e) => {
+  if (e.target.id === "company") state.setup.company = e.target.value;
+  if (e.target.id === "jd") state.setup.jd = e.target.value;
+});
+document.addEventListener("change", (e) => {
+  if (e.target.id === "mineRole" && state.mine) state.mine.role = e.target.value;
+  if (e.target.id === "mineComp" && state.mine) state.mine.comp = e.target.value;
+});
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+    if (e.target.id === "answer") { e.preventDefault(); submitAnswer(); }
+    if (e.target.id === "mineInput") { e.preventDefault(); $("[data-action=mine-send]")?.click(); }
+  }
+  if (e.key === "Escape" && state.editing) { state.editing = null; renderEditor(); }
+});
+
+document.addEventListener("click", async (e) => {
+  const tab = e.target.closest("[data-tab]");
+  if (tab) { showTab(tab.dataset.tab); return; }
+  const set = e.target.closest("[data-set]");
+  if (set && !set.disabled) { state.setup[set.dataset.set] = set.dataset.val; renderRail(); if (!state.session) renderRoom(); return; }
+  const flt = e.target.closest("[data-filter]");
+  if (flt) { state.storyFilter = flt.dataset.filter; renderStories(); return; }
+  const pft = e.target.closest("[data-pftrack]");
+  if (pft) { pft.setAttribute("aria-pressed", pft.getAttribute("aria-pressed") !== "true"); return; }
+  if (e.target === $("#overlay")) { state.editing = null; renderEditor(); return; }
+  const btn = e.target.closest("[data-action]");
+  if (!btn || btn.disabled) return;
+  const act = btn.dataset.action, id = btn.dataset.id;
+  switch (act) {
+    case "start": startRound(); break;
+    case "drill": state.setup.type = btn.dataset.type; startRound(); break;
+    case "submit": submitAnswer(); break;
+    case "look": state.showLook = true; { const v = $("#answer")?.value; renderRoom(); if (v) $("#answer").value = v; } break;
+    case "skip": if (state.pendingQ?.kind === "follow") { state.pendingQ = null; state.phase = "scored"; renderPractice(); } else skipQuestion(); break;
+    case "follow": answerFollowUp(); break;
+    case "next": startRound(); break;
+    case "end": endSession(); break;
+    case "discard": state.session = null; resetSession(); break;
+    case "stop": ctl?.abort(); break;
+    case "save-candidate": {
+      const c = state.round.turns.at(-1).eval.storyCandidate, t = state.round.turns.at(-1);
+      openEditor({ id: uid("s"), title: c.title, competencies: c.competencies, status: "draft", action: t.a, createdAt: Date.now(), practice: [] });
+      break;
+    }
+    case "practice-story": {
+      const s = state.stories.find((x) => x.id === id);
+      if (state.session) { state.error = "Finish or end the current session first."; showTab("practice"); renderRoom(); break; }
+      showTab("practice"); startRound(s); break;
+    }
+    case "mine-open": state.mine = { role: "Meta", comp: COMPETENCIES[1], turns: [], started: false }; renderMiner(); break;
+    case "mine-story": {
+      const s = state.stories.find((x) => x.id === id);
+      state.mine = { role: s.role || "Meta", comp: (s.competencies || [])[0] || COMPETENCIES[0], turns: [], started: true, seed: s };
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      mineCall(); break;
+    }
+    case "mine-start": state.mine.role = $("#mineRole").value.trim() || "my last role"; state.mine.comp = $("#mineComp").value; state.mine.started = true; mineCall(); break;
+    case "mine-send": { const v = $("#mineInput").value.trim(); if (!v) break; state.mine.turns.push({ role: "user", content: v }); mineCall(); break; }
+    case "mine-draft": mineDraft(); break;
+    case "mine-close": ctl?.abort(); state.mine = null; renderMiner(); break;
+    case "sync": syncNotion(); break;
+    case "story-copy": {
+      const s = state.stories.find((x) => x.id === id);
+      const md = `### ${s.title}${s.attribution ? " `[" + s.attribution + "]`" : ""}\n` + [["Situation", s.situation], ["Task", s.task], ["What I did", s.action], ["Outcome", s.result], ["Numbers", s.metrics], ["Lesson", s.lessons]].filter(([, v]) => v).map(([k, v]) => `**${k}.** ${v}`).join("\n") + ((s.competencies || []).length ? `\n*${s.competencies.join(" · ")}*` : "");
+      try { await navigator.clipboard.writeText(md); btn.textContent = "Copied"; } catch { btn.textContent = "Copy blocked here. Use Edit to select the text"; }
+      break;
+    }
+    case "story-new": openEditor({ id: uid("s"), status: "draft", competencies: [], createdAt: Date.now(), practice: [] }); break;
+    case "story-edit": openEditor(state.stories.find((x) => x.id === id)); break;
+    case "story-cancel": state.editing = null; renderEditor(); break;
+    case "story-save": saveEditor(); break;
+    case "story-delete":
+      if (!state.confirmDelete) { state.confirmDelete = true; btn.textContent = "Confirm delete"; break; }
+      { const sid = state.editing.id; state.stories = state.stories.filter((x) => x.id !== sid); queue(() => store.delStory(sid)); state.editing = null; renderEditor(); renderStories(); }
+      break;
+    case "profile-save": {
+      const p = state.profile || {};
+      Object.assign(p, { name: $("#pf-name").value.trim(), background: $("#pf-bg").value.trim(), companies: $("#pf-co").value.trim(), level: $("#pf-level").value.trim(), notionPage: $("#pf-notion").value.trim(), notes: $("#pf-notes").value.trim(),
+        tracks: [...document.querySelectorAll("[data-pftrack]")].filter((b) => b.getAttribute("aria-pressed") === "true").map((b) => b.dataset.pftrack), updatedAt: Date.now() });
+      state.profile = p;
+      queue(() => store.setProfile(p)).then(() => { const s = $("#pfSaved"); if (s) s.textContent = "Saved"; });
+      break;
+    }
+    case "notes-clear": { const p = state.profile; p.coachNotes = []; queue(() => store.setProfile(p)); renderProfile(); renderProgress(); break; }
+  }
+});
+
+// ---------- Boot ----------
+async function boot() {
+  try { const t = localStorage.getItem("prep-room-tab"); if (t) showTab(t); } catch {}
+  renderPractice(); renderStories(); renderProgress(); renderProfile();
+  const use = window.claude?.use ? (n) => window.claude.use(n) : async () => null;
+  const [db, smp, mc] = await Promise.all([use("db").catch(() => null), use("sample").catch(() => null), use("mcp").catch(() => null)]);
+  sample = smp; mcp = mc;
+  store = db ? dbStore(db) : localStore();
+  if (!db) setNotice("Saving to this browser only. Open this page in Claude to keep your history across devices.");
+  try {
+    const [p, st, ss, src] = await Promise.all([store.getProfile(), store.listStories(), store.listSessions(), store.getSource()]);
+    state.profile = p; state.stories = st; state.sessions = ss; state.source = src;
+  } catch (e) { setNotice("Couldn't load your saved data: " + (e?.message || e?.code || "unknown error")); }
+  state.loaded = true;
+  const tracks = state.profile?.tracks;
+  if (tracks?.length && !tracks.includes(state.setup.track)) state.setup.track = tracks[0];
+  renderPractice(); renderStories(); renderProgress(); renderProfile(); renderSync();
+}
+boot();
+</script>
