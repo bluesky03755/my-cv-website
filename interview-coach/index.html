@@ -206,7 +206,37 @@ td.n, th.n { text-align: right; font-family: var(--font-num); font-variant-numer
 .rv-item:hover { background: var(--sunk); color: var(--ink); }
 .rv-item[aria-current="true"] { background: var(--surface); color: var(--ink); box-shadow: inset 3px 0 0 var(--org, var(--accent)); font-weight: 500; }
 .rv-item .r { width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--line); transform: translateY(-1px); }
-.r-1 { background: var(--bad) !important; } .r-2 { background: var(--mark) !important; } .r-3 { background: var(--good) !important; }
+.r.m-0 { background: transparent; box-shadow: inset 0 0 0 1.5px var(--muted); }
+.r.m-1 { background: var(--bad); } .r.m-2 { background: var(--mark); } .r.m-3 { background: var(--good); }
+.mpill { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.mpill.m-0 { box-shadow: inset 0 0 0 1px var(--line); color: var(--muted); }
+.mpill.m-1 { background: var(--bad-soft); color: var(--bad); }
+.mpill.m-2 { background: var(--mark-soft); color: var(--mark); }
+.mpill.m-3 { background: var(--good-soft); color: var(--good); }
+.mlegend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12.5px; color: var(--muted); align-items: center; }
+.mlegend > span { display: inline-flex; gap: 6px; align-items: center; }
+.mlegend b { color: var(--ink); font-weight: 600; }
+.sq { --c: var(--muted); --fill: 0%; display: inline-block; width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid var(--c); background: linear-gradient(to top, var(--c) var(--fill), transparent var(--fill)); padding: 0; cursor: pointer; flex: none; }
+i.sq { width: 12px; height: 12px; border-radius: 3px; cursor: default; }
+.sq.m-1 { --c: var(--bad); --fill: 34%; } .sq.m-2 { --c: var(--mark); --fill: 67%; } .sq.m-3 { --c: var(--good); --fill: 100%; }
+button.sq:hover { outline: 2px solid var(--ink); outline-offset: 1px; }
+.mbar { display: flex; gap: 2px; height: 14px; border-radius: 4px; overflow: hidden; background: var(--sunk); }
+.mbar.sm { height: 10px; }
+.mbar span { min-width: 4px; }
+.mbar .b-0 { background: var(--line); } .mbar .b-1 { background: var(--bad); } .mbar .b-2 { background: var(--mark); } .mbar .b-3 { background: var(--good); }
+.orows { display: grid; gap: 10px; }
+.orow { display: grid; grid-template-columns: 110px minmax(0, 1fr) 92px; gap: 12px; align-items: center; font-size: 13.5px; }
+.orow .olabel { display: inline-flex; gap: 8px; align-items: center; }
+.orow .num { text-align: right; font-size: 12.5px; }
+.matrix td, .matrix th { vertical-align: middle; }
+.matrix th.org { text-align: center; white-space: nowrap; }
+.matrix td.cell { text-align: center; min-width: 76px; }
+.matrix td.cell > div { display: inline-flex; flex-wrap: wrap; gap: 4px; justify-content: center; max-width: 110px; }
+.matrix td.comp { white-space: nowrap; font-size: 13.5px; }
+.matrix td.sum { white-space: nowrap; font-size: 12.5px; }
+.matrix tr.gap td.comp { color: var(--bad); }
+.matrix .none { color: var(--line); }
+.gaps { font-size: 14px; margin: 0; display: grid; gap: 4px; }
 .deck { display: grid; gap: 16px; min-width: 0; }
 .deck-head { display: grid; gap: 8px; border-top: 4px solid var(--org, var(--accent)); background: var(--surface); border-radius: var(--r); padding: 18px 20px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .deck-head h2 { font-family: var(--font-voice); font-weight: 500; font-size: 27px; line-height: 1.2; }
@@ -334,7 +364,7 @@ const VERDICTS = ["Strong hire", "Hire", "Lean hire", "Lean no hire", "No hire"]
 // ---------- State ----------
 const state = {
   tab: "review",
-  rv: { org: "", comp: "", focus: "", mode: "order", id: null, flipped: {} },
+  rv: { org: "", comp: "", focus: "", status: "", mode: "order", id: null, flipped: {} },
   profile: null, stories: [], sessions: [],
   setup: { track: "so", type: "pick", diff: "standard", company: "", jd: "" },
   session: null, round: null, pendingQ: null, phase: "idle", // idle | asking | answering | scoring | scored | debriefing
@@ -812,7 +842,7 @@ function storyAvg(s) { return avg((s.practice || []).map((p) => p.score)); }
 function renderStories() {
   renderReview();
   const comps = [...new Set(state.stories.flatMap((s) => s.competencies || []))].sort();
-  $("#storyCount").textContent = state.loaded ? `${state.stories.length} stor${state.stories.length === 1 ? "y" : "ies"} · ${state.stories.filter((s) => s.status === "ready").length} ready` : "";
+  $("#storyCount").textContent = state.loaded ? `${state.stories.length} stor${state.stories.length === 1 ? "y" : "ies"} · ${state.stories.filter((s) => s.status !== "to-mine" && mastery(s) >= 2).length} solid or nailed` : "";
   $("#storyFilter").innerHTML = comps.length ? [["", "All"], ...comps.map((c) => [c, c])].map(([k, l]) => `<button class="chip" data-filter="${esc(k)}" aria-pressed="${state.storyFilter === k}">${esc(l)}</button>`).join("") : "";
   const list = state.stories.filter((s) => !state.storyFilter || (s.competencies || []).includes(state.storyFilter))
     .sort((a, b) => ({ ready: 0, draft: 1 }[a.status] ?? 2) - ({ ready: 0, draft: 1 }[b.status] ?? 2) || (b.updatedAt || 0) - (a.updatedAt || 0));
@@ -821,7 +851,7 @@ function renderStories() {
   $("#storyGrid").innerHTML = `<div class="grid">${list.map((s) => {
     const a = storyAvg(s), status = s.status || "draft";
     return `<article class="card story">
-      <div class="row"><span class="pill ${status}">${status === "ready" ? "Ready" : status === "draft" ? "Draft" : "To mine"}</span>${s.role ? `<span class="label">${esc(s.role)}</span>` : ""}${s.attribution ? `<span class="chip sm">${esc(s.attribution)}</span>` : ""}${s.source === "notion" ? "" : `<span class="lock">added here</span>`}</div>
+      <div class="row">${status === "to-mine" ? "" : mPill(s)}<span class="pill ${status}" title="How complete the story is in your Experience Bank">${status === "ready" ? "Complete" : status === "draft" ? "Has gaps" : "To mine"}</span>${s.role ? `<span class="label">${esc(s.role)}</span>` : ""}${s.attribution ? `<span class="chip sm">${esc(s.attribution)}</span>` : ""}${s.source === "notion" ? "" : `<span class="lock">added here</span>`}</div>
       ${s.confidential ? `<span class="lock">🔒 Confidential. Say “${esc(s.maskedAs || "masked")}”</span>` : ""}
       <h3>${esc(s.title)}</h3>
       ${s.oneLiner ? `<p class="one">${esc(s.oneLiner)}</p>` : ""}
@@ -1023,8 +1053,17 @@ const ORGS = [
 const orgIdx = (s) => { const i = ORGS.findIndex((o) => o.re.test(s.role || "")); return i < 0 ? 99 : i; };
 const orgOf = (s) => ORGS[orgIdx(s)] || { k: "other", label: s.role || "Other" };
 const byBank = (a, b) => orgIdx(a) - orgIdx(b) || (a.order ?? 999) - (b.order ?? 999) || String(a.title).localeCompare(String(b.title));
-const lastRating = (s) => (s.reviews || []).at(-1)?.rating || 0;
+// Mastery = the latest signal on a story: a recall rating in Review (1-3), or a practice score on it (<3 shaky, <4 solid, 4+ nailed). 0 = new.
+const MASTERY = ["New", "Shaky", "Solid", "Nailed"];
+function masteryInfo(s) {
+  const ev = [...(s.reviews || []).map((r) => ({ at: r.at, m: r.rating, via: "review" })),
+              ...(s.practice || []).map((p) => ({ at: p.at, m: p.score < 3 ? 1 : p.score < 4 ? 2 : 3, via: "practice" }))].sort((a, b) => a.at - b.at);
+  return ev.at(-1) || { m: 0 };
+}
+const mastery = (s) => masteryInfo(s).m;
+const lastRating = mastery;
 const RATINGS = { 1: "Shaky", 2: "Solid", 3: "Nailed" };
+const mPill = (s) => { const m = mastery(s); return `<span class="mpill m-${m}" title="${m ? "Latest signal: " + MASTERY[m] : "Not reviewed or practiced yet"}">${MASTERY[m]}</span>`; };
 const CARDS = [
   { k: "situation", L: "S", label: "Situation", cue: "Set the scene. What was going on, and what was at stake?" },
   { k: "task",      L: "T", label: "Task",      cue: "What was yours to own?" },
@@ -1039,7 +1078,8 @@ function reviewList() {
   return state.stories.filter((s) => s.status !== "to-mine")
     .filter((s) => !r.org || orgOf(s).k === r.org)
     .filter((s) => !r.comp || (s.competencies || []).includes(r.comp))
-    .filter((s) => r.focus === "rehearse" ? !!s.tag : r.focus === "shaky" ? lastRating(s) !== 3 : true)
+    .filter((s) => r.focus !== "rehearse" || !!s.tag)
+    .filter((s) => r.status === "" || r.status == null || String(mastery(s)) === r.status)
     .sort(byBank);
 }
 function pickRandom(list, notId) {
@@ -1086,15 +1126,16 @@ function renderReview() {
       ${orgs.map((o) => `<button class="chip" data-action="rv-set" data-key="org" data-val="${o.k}" aria-pressed="${r.org === o.k}" style="--org:var(--org-${o.k})"><span class="orgdot"></span> ${o.label} <span class="num muted">${o.n}</span></button>`).join("")}
     </div></div>
     <div class="rv-row">
-      ${seg("focus", [["", "All stories"], ["rehearse", "Rehearse first"], ["shaky", "Needs work"]])}
+      ${seg("focus", [["", "All stories"], ["rehearse", "Rehearse first"]])}
+      <span class="seg" aria-label="Filter by how well you know it"><button data-action="rv-set" data-key="status" data-val="" aria-pressed="${!r.status}">Any status</button>${MASTERY.map((l, i) => `<button data-action="rv-set" data-key="status" data-val="${i}" aria-pressed="${r.status === String(i)}">${l} <span class="num">${all.filter((x) => mastery(x) === i).length}</span></button>`).join("")}</span>
       ${seg("mode", [["order", "In order"], ["random", "Random"]])}
       <select id="rvComp" aria-label="Filter by competency" style="width:auto;max-width:100%"><option value="">Any competency</option>${comps.map((c) => `<option ${r.comp === c ? "selected" : ""}>${esc(c)}</option>`).join("")}</select>
-      <select id="rvJump" aria-label="Jump to a story" style="width:auto;max-width:100%;min-width:0;flex:1 1 220px">${list.map((s) => `<option value="${s.id}" ${cur && s.id === cur.id ? "selected" : ""}>${esc(orgOf(s).label + " · " + s.title)}</option>`).join("")}</select>
+      <select id="rvJump" aria-label="Jump to a story" style="width:auto;max-width:100%;min-width:0;flex:1 1 220px">${list.map((s) => `<option value="${s.id}" ${cur && s.id === cur.id ? "selected" : ""}>${esc(orgOf(s).label + " · " + s.title + " · " + MASTERY[mastery(s)])}</option>`).join("")}</select>
     </div></div>`;
-  const nav = `<nav class="rv-nav" aria-label="Stories">${ORGS.concat([{ k: "other", label: "Other" }]).map((o) => {
+  const nav = `<nav class="rv-nav" aria-label="Stories"><div class="mlegend">${MASTERY.map((l, i) => `<span><span class="r m-${i}" style="display:inline-block;width:8px;height:8px;border-radius:50%"></span>${l}</span>`).join("")}</div>${ORGS.concat([{ k: "other", label: "Other" }]).map((o) => {
     const items = list.filter((s) => orgOf(s).k === o.k);
     if (!items.length) return "";
-    return `<div class="rv-group" style="--org:var(--org-${o.k})"><h4><span class="orgdot"></span><span>${o.label}</span><span>${items.length}</span></h4>${items.map((s) => `<button class="rv-item" data-action="rv-pick" data-id="${s.id}" aria-current="${cur && s.id === cur.id}"><span class="r ${lastRating(s) ? "r-" + lastRating(s) : ""}" title="${RATINGS[lastRating(s)] || "Not reviewed"}"></span><span>${esc(s.title)}</span></button>`).join("")}</div>`;
+    return `<div class="rv-group" style="--org:var(--org-${o.k})"><h4><span class="orgdot"></span><span>${o.label}</span><span>${items.length}</span></h4>${items.map((s) => `<button class="rv-item" data-action="rv-pick" data-id="${s.id}" aria-current="${cur && s.id === cur.id}"><span class="r m-${mastery(s)}" title="${MASTERY[mastery(s)]}"></span><span>${esc(s.title)}</span></button>`).join("")}</div>`;
   }).join("")}</nav>`;
   let deck;
   if (!cur) deck = `<div class="empty">No stories match these filters. <button class="btn ghost" data-action="rv-clear">Clear filters</button></div>`;
@@ -1103,7 +1144,8 @@ function renderReview() {
     const lr = (cur.reviews || []).at(-1);
     deck = `<div class="deck" style="--org:var(--org-${o.k})">
       <div class="deck-head">
-        <div class="eyebrow"><span class="orgdot"></span><b style="color:var(--ink)">${esc(cur.role || o.label)}</b><span class="num">${pos} of ${list.length}</span>
+        <div class="eyebrow"><span class="orgdot"></span><b style="color:var(--ink)">${esc(cur.role || o.label)}</b><span class="num">${pos} of ${list.length}</span>${mPill(cur)}
+          ${cur.status === "draft" ? `<span class="chip sm" title="The Experience Bank lists open gaps for this story">Has gaps</span>` : ""}
           ${cur.tag === "rehearse" ? `<span class="badge">Rehearse first</span>` : cur.tag === "failure" ? `<span class="badge fail">Failure story</span>` : ""}
           ${cur.attribution ? `<span class="chip sm">${esc(cur.attribution)}</span>` : ""}${cur.confidential ? `<span class="lock">🔒 Say “${esc(cur.maskedAs || "masked")}”</span>` : ""}</div>
         <h2>${esc(cur.title)}</h2>
@@ -1161,6 +1203,7 @@ function rvRate(n) {
   s.reviews = [...(s.reviews || []), { at: Date.now(), rating: n }].slice(-20);
   queue(() => store.putStory(s));
   rvGo(1);
+  renderStories(); renderProgress();
 }
 function reviewKey(e) {
   const k = e.key;
@@ -1185,7 +1228,7 @@ function renderEditor() {
     <div class="field"><label class="label" for="ed-title">Title</label><input type="text" id="ed-title" value="${esc(s.title)}"></div>
     <div class="pair">
       <div class="field"><label class="label" for="ed-role">Where</label><input type="text" id="ed-role" value="${esc(s.role)}" list="roles2"><datalist id="roles2"><option value="Motorola"><option value="Bain & Company"><option value="Accenture"><option value="Meta"><option value="Tuck MBA"></datalist></div>
-      <div class="field"><label class="label" for="ed-status">Status</label><select id="ed-status">${[["ready", "Ready"], ["draft", "Draft"], ["to-mine", "To mine"]].map(([k, l]) => `<option value="${k}" ${s.status === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+      <div class="field"><label class="label" for="ed-status">Completeness in the bank</label><select id="ed-status">${[["ready", "Complete"], ["draft", "Has gaps"], ["to-mine", "To mine"]].map(([k, l]) => `<option value="${k}" ${s.status === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
     </div>
     <div class="field"><label class="label" for="ed-comps">Competencies (comma-separated)</label><input type="text" id="ed-comps" value="${esc((s.competencies || []).join(", "))}"></div>
     <div class="field"><label class="label" for="ed-one">One-line opener</label><input type="text" id="ed-one" value="${esc(s.oneLiner)}"></div>
@@ -1209,11 +1252,46 @@ function saveEditor() {
 }
 
 // ---------- Render: Progress ----------
+function coverageHtml() {
+  const all = state.stories.filter((s) => s.status !== "to-mine");
+  if (!all.length) return `<div class="empty">Load your stories to see coverage across experiences and competencies.</div>`;
+  const count = (xs) => { const c = [0, 0, 0, 0]; xs.forEach((s) => c[mastery(s)]++); return c; };
+  const bar = (c, cls = "") => `<div class="mbar ${cls}" role="img" aria-label="${MASTERY.map((l, i) => l + " " + c[i]).join(", ")}">${c.map((n, i) => n ? `<span class="b-${i}" style="flex:${n}" title="${MASTERY[i]}: ${n}"></span>` : "").join("")}</div>`;
+  const total = count(all), ready = total[2] + total[3];
+  const orgs = ORGS.filter((o) => all.some((s) => orgOf(s).k === o.k));
+  const comps = COMPETENCIES.concat([...new Set(all.flatMap((s) => s.competencies || []))].filter((c) => !COMPETENCIES.includes(c)));
+  const rows = comps.map((c) => {
+    const xs = all.filter((s) => (s.competencies || []).includes(c));
+    return { c, xs, ready: xs.filter((s) => mastery(s) >= 2).length };
+  });
+  const none = rows.filter((r) => !r.xs.length).map((r) => r.c);
+  const notSolid = rows.filter((r) => r.xs.length && !r.ready).map((r) => r.c);
+  const sq = (s) => `<button class="sq m-${mastery(s)}" data-action="rv-open" data-id="${s.id}" title="${esc(s.title + " · " + MASTERY[mastery(s)])}" aria-label="${esc(s.title + ", " + MASTERY[mastery(s)] + ". Open in Review")}"></button>`;
+  const legend = `<div class="mlegend">${MASTERY.map((l, i) => `<span><i class="sq m-${i}"></i>${l} <b class="num">${total[i]}</b></span>`).join("")}</div>`;
+  return `
+  <div class="card" style="display:grid;gap:16px">
+    <div class="row" style="justify-content:space-between;align-items:baseline"><h3>Story coverage</h3><span class="muted" style="font-size:12.5px">${ready} of ${all.length} stories solid or nailed</span></div>
+    ${bar(total)}
+    ${legend}
+    <p class="muted" style="margin:0;font-size:13px">Status is your latest signal on a story: a recall rating in Review, or a practice score on it (under 3 shaky, 3 to 3.9 solid, 4+ nailed). New means not reviewed or practiced yet.</p>
+    <div class="orows">${orgs.map((o) => { const xs = all.filter((s) => orgOf(s).k === o.k), c = count(xs); return `<div class="orow" style="--org:var(--org-${o.k})"><span class="olabel"><span class="orgdot"></span>${o.label}</span>${bar(c, "sm")}<span class="num muted">${c[2] + c[3]}/${xs.length} solid+</span></div>`; }).join("")}</div>
+  </div>
+  <div class="card" style="margin-top:16px;display:grid;gap:12px">
+    <div class="row" style="justify-content:space-between;align-items:baseline"><h3>Competencies × experiences</h3><span class="muted" style="font-size:12.5px">One square per story · click to review it</span></div>
+    ${none.length || notSolid.length ? `<div class="gaps">${none.length ? `<div><b>No story yet:</b> ${esc(none.join(", "))}</div>` : ""}${notSolid.length ? `<div><b>Has stories, none solid yet:</b> ${esc(notSolid.join(", "))}</div>` : ""}</div>` : `<p class="gaps">Every competency has at least one solid story.</p>`}
+    <div class="tbl-wrap"><table class="matrix">
+      <thead><tr><th>Competency</th>${orgs.map((o) => `<th class="org" style="--org:var(--org-${o.k})"><span class="orgdot"></span> ${o.label}</th>`).join("")}<th class="n">Solid+</th></tr></thead>
+      <tbody>${rows.map((r) => `<tr class="${r.xs.length ? "" : "gap"}"><td class="comp">${esc(r.c)}</td>${orgs.map((o) => { const xs = r.xs.filter((s) => orgOf(s).k === o.k); return `<td class="cell">${xs.length ? `<div>${xs.map(sq).join("")}</div>` : `<span class="none" aria-label="none">·</span>`}</td>`; }).join("")}<td class="n sum">${r.xs.length ? `${r.ready}/${r.xs.length}` : "none"}</td></tr>`).join("")}</tbody>
+    </table></div>
+    ${legend}
+  </div>`;
+}
+
 function renderProgress() {
   const el = $("#progress");
   if (!state.loaded) { el.innerHTML = `<div class="empty">Loading your history…</div>`; return; }
   const a = answers();
-  if (!a.length) { el.innerHTML = `<div class="empty">Nothing scored yet. Every answer you submit lands here: your trend against the hire bar, each of the five dimensions over time, and the habits the coach keeps flagging.</div>`; return; }
+  if (!a.length) { el.innerHTML = coverageHtml() + `<div class="empty" style="margin-top:16px">No practice answers scored yet. Once you practice, this tab also shows your trend against the hire bar, each of the five scoring dimensions over time, and the habits the coach keeps flagging.</div>`; return; }
   const ds = dimStats(), last10 = a.slice(-10);
   const sorted = ds.filter((d) => d.recent != null).sort((x, y) => y.recent - x.recent);
   const pts = a.slice(-30);
@@ -1227,7 +1305,8 @@ function renderProgress() {
   const byType = Object.entries(TYPES).filter(([k]) => k !== "pick").map(([k, t]) => { const xs = a.filter((p) => p.type === k && !p.follow); return { label: t.label, n: xs.length, v: avg(xs.map((p) => p.overall)) }; }).filter((r) => r.n);
   const byTrack = Object.entries(TRACKS).map(([k, t]) => { const xs = a.filter((p) => p.track === k); return { label: t.label, n: xs.length, v: avg(xs.map((p) => p.overall)) }; }).filter((r) => r.n);
   const notes = (state.profile?.coachNotes || []).slice().reverse();
-  el.innerHTML = `
+  el.innerHTML = coverageHtml() + `
+    <h2 style="font-family:var(--font-voice);font-weight:500;font-size:22px;margin:24px 0 12px">Practice scores</h2>
     <div class="tiles">
       <div class="tile"><div class="label">Avg, last 10 answers</div><div class="v">${f1(avg(last10.map((p) => p.overall)))}</div><div class="s">3.0 = meets the hire bar</div></div>
       <div class="tile"><div class="label">Answers scored</div><div class="v">${a.length}</div><div class="s">across ${state.sessions.length} session${state.sessions.length === 1 ? "" : "s"}</div></div>
@@ -1349,9 +1428,9 @@ document.addEventListener("click", async (e) => {
     case "mine-close": ctl?.abort(); state.mine = null; renderMiner(); break;
     case "sync": syncNotion(); break;
     case "rv-set": state.rv[btn.dataset.key] = btn.dataset.val; renderReview(); break;
-    case "rv-clear": Object.assign(state.rv, { org: "", comp: "", focus: "" }); renderReview(); break;
+    case "rv-clear": Object.assign(state.rv, { org: "", comp: "", focus: "", status: "" }); renderReview(); break;
     case "rv-pick": state.rv.id = id; state.rv.flipped = {}; renderReview(); break;
-    case "rv-open": Object.assign(state.rv, { org: "", comp: "", focus: "", id, flipped: {} }); showTab("review"); renderReview(); window.scrollTo({ top: 0 }); break;
+    case "rv-open": Object.assign(state.rv, { org: "", comp: "", focus: "", status: "", id, flipped: {} }); showTab("review"); renderReview(); window.scrollTo({ top: 0 }); break;
     case "rv-flip": rvSetFlip(btn.dataset.k, !state.rv.flipped[btn.dataset.k]); break;
     case "rv-flipnext": rvFlipNext(); break;
     case "rv-all": rvRevealAll(); break;

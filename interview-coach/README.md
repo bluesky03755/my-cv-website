@@ -4,10 +4,10 @@ A mock-interview coach for strategy & operations, product management, corporate 
 
 What it does:
 
-- **Review**: flip-card STAR drills for every story. Filter by experience (Motorola, Bain, Accenture, Meta, Tuck), competency, "Rehearse first" or "Needs work"; jump to any story, step through in order, or shuffle. Random mode weights toward stories you rated shaky or haven't reviewed lately. Rate each recall Shaky / Solid / Nailed. Keyboard: Space flips the next card, ←/→ move, R shuffles, 1–3 rate.
+- **Review**: flip-card STAR drills for every story. Filter by experience (Motorola, Bain, Accenture, Meta, Tuck), competency, "Rehearse first", or status (New, Shaky, Solid, Nailed); jump to any story, step through in order, or shuffle. Random mode weights toward stories you rated shaky or haven't reviewed lately. Rate each recall Shaky / Solid / Nailed. Keyboard: Space flips the next card, ←/→ move, R shuffles, 1–3 rate.
 - **Practice**: Claude plays the interviewer. You pick the track, question type (behavioral, "how would you approach…", product sense, metrics & estimation, your narrative) and difficulty, optionally with a company and job description. You type your answer against a clock. You get a scorecard on five dimensions, a hire verdict, fixes, a tighter version of your answer with no invented facts, an accuracy check against your Experience Bank, and the follow-up a real interviewer would ask.
 - **Story bank**: your STAR stories, indexed from the Notion Experience Bank. *Refresh from Notion* re-reads the page and updates the index. *Mine a story with the coach* interviews you to capture new episodes; *Copy for Notion* hands them back to the bank.
-- **Progress**: score trend against the hire bar, per-dimension averages (last 10 vs prior 10), and the habits the coach keeps flagging. Session debriefs steer future questions toward weak spots.
+- **Progress**: story coverage (every story's status overall and per experience, plus a competency × experience map that shows gaps), then the score trend against the hire bar, per-dimension averages (last 10 vs prior 10), and the habits the coach keeps flagging. Session debriefs steer future questions toward weak spots.
 
 Runtime: Claude (`sample`) for questions and scoring, the artifact database (`db`, owner-only) for profile, stories and sessions, and the Notion connector (`mcp`, `notion-fetch`) for the Experience Bank. Opened outside Claude, the page falls back to browser storage and the coach stays off.
 
